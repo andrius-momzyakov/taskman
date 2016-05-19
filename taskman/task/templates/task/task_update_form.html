@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Список задач{% endblock %}
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
+
+{% if attachments %}
+<h2>Присоединенные файлы:</h2>
+{% endif %}
+{% for attachment in attachments %}
+<a href="{{ MEDIA_URL }}{{ attachment.file.name }}">{{ attachment.file.name }}</a>
+{% endfor %}
+
+{% if comments %}
+<h2>Комментарии:</h2>
+<table>
+{% for comment in comments%}
+    <tr>
+        <td>{{ comment.author }}</td>
+        <td>{{ comment.created }}</td>
+    </tr>
+<tr>        <td>{{ comment.body }}</td>
+</tr>
+    {% endfor %}
+</table>
+
+<form action="{% url 'comment' %}" method="post">{% csrf_token %}
+    <input type="hidden" name="task" value="{{ object.id }}">
+<p><label for="id_author">Автор:</label> <input id="id_author" name="author" type="text"/></p>
+<p><label for="id_body">Текст:</label> <input id="id_body" name="body" type="text"/></p>
+
+    <input type="submit" value="Save" />
+</form>
+
+    {% endif %}
+{% endblock %}

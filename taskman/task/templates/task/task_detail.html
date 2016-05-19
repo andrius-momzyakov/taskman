@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Описание задачи{% endblock %}
+{% block content %}
+<h1>{{ object.subject }}</h1>
+<a href="{% url 'edit' object.id %}">Изменить</a>
+<p><b>Тип:</b>{{ object.type }}</p>
+<p><b>Описание:</b>{{ object.desc }}</p>
+<p><b>Заявитель:</b>{{ object.created_by }}</p>
+<p><b>Исполнитель:</b>{{ object.executor }}</p>
+{% if object.parent %}
+<p><b>Родительская задача</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
+{% endif %}
+
+{% if attachments %}
+<h2>Присоединенные файлы:</h2>
+{% endif %}
+{% for attachment in attachments %}
+<a href="{{ MEDIA_URL }}{{ attachment.file.name }}">{{ attachment.file.name }}</a>
+{% endfor %}
+
+{% if comments %}
+<h2>Комментарии:</h2>
+<table>
+{% for comment in comments%}
+    <tr>
+        <td>{{ comment.author }}</td>
+        <td>{{ comment.created }}</td>
+    </tr>
+<tr>        <td>{{ comment.body }}</td>
+</tr>
+    {% endfor %}
+</table>
+    {% endif %}
+{% endblock %}

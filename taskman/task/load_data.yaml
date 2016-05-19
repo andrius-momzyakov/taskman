@@ -1,0 +1,21 @@
+- model: task.TaskType
+  pk: 1
+  fields:
+    short_typename: BUG
+    typename: дефект
+- model: task.TaskType
+  pk: 2
+  fields:
+    short_typename: TASK
+    typename: задача
+- model: task.TaskType
+  pk: 3
+  fields:
+    short_typename: WISH
+    typename: пожелание
+- model: task.TaskType
+  pk: 4
+  fields:
+    short_typename: REQUIRE
+    typename: требование
+

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Система учета задач{% endblock %}</title>
+</head>
+<body>
+<div class="TopMenu">
+{% block menu %}
+<table>
+    <tr>
+        <td><a href="{% url 'new' %}">Новая задача</a></td>
+        <td><a href="{% url 'home' %}">В список</a></td>
+    </tr>
+</table>
+{% endblock %}
+</div>
+{% block content %}{% endblock %}
+
+</body>
+</html>
