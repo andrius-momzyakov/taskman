@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+import task
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^task/', include('task.urls')),
-    url(r'^$', 'task.views.root'),
-
+    url(r'^$', task.views.root),
+    url('^accounts/', include('django.contrib.auth.urls')),
 ]

@@ -11,6 +11,17 @@
     <tr>
         <td><a href="{% url 'new' %}">Новая задача</a></td>
         <td><a href="{% url 'home' %}">В список</a></td>
+        {% if user.is_authenticated %}
+            <td>
+            <A href="/accounts/logout/?next=/">Выйти</A>
+                </td>
+            <td>
+                <A href="/accounts/password_change/?next=/">Сменить
+                пароль</A>
+            </td>
+        {% else %}
+            <td>    <A href="/accounts/login/?next=/">Войти</A></td>
+        {% endif %}
     </tr>
 </table>
 {% endblock %}

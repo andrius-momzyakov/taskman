@@ -32,7 +32,7 @@ class Task(models.Model):
     closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
     close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True, blank=True,
                                     choices=CLOSE_REASONS)
-    attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True, null=True)
+    #attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True)
     executor = models.ForeignKey(User, related_name='executor', null=True, blank=True)
     type = models.ForeignKey('TaskType', verbose_name='Тип')
@@ -55,6 +55,7 @@ class TaskType(models.Model):
         return self.typename
 
 class Attachment(models.Model):
+    task = models.ForeignKey(Task, verbose_name='Задача')
     file = models.FileField(verbose_name='Файл')
 
     def __str__(self):
