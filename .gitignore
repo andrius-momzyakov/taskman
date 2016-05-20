@@ -1,0 +1,3 @@
+*.pyc
+taskman/taskman/settings.py
+.idea/
