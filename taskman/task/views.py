@@ -1,14 +1,17 @@
 import mimetypes
 import urllib
 
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, View
 from django.core.files import File
+from django.core.context_processors import csrf
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.core.urlresolvers import reverse
+
 
 
 from .models import Task, Comment, Attachment
@@ -34,18 +37,49 @@ class TaskDetail(DetailView):
         return context
 
 
+class NewTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'parent', ]
+
 @method_decorator(login_required, name='dispatch')
+class NewTask(View):
+    template = 'task_create_form.html'
+
+    def get(self, request, *args, **kwargs):
+        form = NewTaskForm()
+        return render_to_response(template_name=self.template, context={'form':form},
+                                  context_instance=RequestContext(request, {}
+                                                                  .update(csrf(request))))
+
+
+    def post(self, request, *args, **kwargs):
+        form = NewTaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.created_by = request.user
+            task.save()
+            return redirect(reverse('detail', args=[task.id,]))
+        return render_to_response(template_name=self.template, context={'form':form},
+                                  context_instance=RequestContext(request, {}
+                                                                  .update(csrf(request))))
+
+
+'''
 class NewTask(CreateView):
     model = Task
     template_name_suffix = '_create_form'
-    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'created_by', 'created', 'parent', ]
+    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'created_by',
+              'created', 'parent', ]
+'''
 
 
 @method_decorator(login_required, name='dispatch')
 class EditTask(UpdateView):
     model = Task
     slug_field = 'id'
-    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'closed', 'close_reason', 'parent', ]
+    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'closed',
+              'close_reason', 'parent', ]
     template_name_suffix = '_update_form'
     slug_field = 'id'
 
@@ -115,5 +149,6 @@ def serve_file(request, name):
     #response = StreamingHttpResponse(FileWrapper(f, chunk_size),
     #                       content_type=mimetypes.guess_type(f)[0])
     #response['Content-Length'] = os.path.getsize(the_file)
-    response['Content-Disposition'] = 'attachment; filename=' + urllib.parse.quote(name.encode('utf-8'))
+    response['Content-Disposition'] = 'attachment; filename=' + \
+                                      urllib.parse.quote(name.encode('utf-8'))
     return response
