@@ -19,11 +19,11 @@
                 <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
             <td><a href="{% url 'edit' task.id %}">Изменить</a></td>
-            <td>{{ task.project }}</td>
-            <td>{{ task.module }}</td>
+            <td>{{ task.project|default_if_none:"" }}</td>
+            <td>{{ task.module|default_if_none:"" }}</td>
             <td>{{ task.created_by }}</td>
             <td>{{ task.created }}</td>
-            <td>{{ task.executor }}</td>
+            <td>{{ task.executor|default_if_none:"" }}</td>
             </tr>
         {% endfor %}
     </table>
