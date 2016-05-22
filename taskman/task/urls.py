@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^comment/$', v.NewComment.as_view(), name='comment'),
     url(r'^attachment/$', v.NewAttachment.as_view(), name='attachment'),
     url(r'^page(?P<page>[0-9]+)/$', v.TaskList.as_view(), name='home'),
+    url(r'^$', v.root)
 ]
