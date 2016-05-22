@@ -8,6 +8,8 @@
 <p><b>Описание:</b>{{ object.desc }}</p>
 <p><b>Заявитель:</b>{{ object.created_by }}</p>
 <p><b>Исполнитель:</b>{{ object.executor }}</p>
+<p><b>Проект:</b>{{ object.project }}</p>
+<p><b>Модуль:</b>{{ object.module }}</p>
 {% if object.parent %}
 <p><b>Родительская задача</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
 {% endif %}
