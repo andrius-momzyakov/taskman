@@ -4,6 +4,16 @@
 {% block content %}
 <h1>Список задач</h1>
     <table border="1" cellspacing="0">
+        <thead>
+        <th>Тип карточки</th>
+        <th>Предмет</th>
+        <th>Действия</th>
+        <th>Проект</th>
+        <th>Модуль</th>
+        <th>Автор</th>
+        <th>Дата созд.</th>
+        <th>Исполнитель</th>
+        </thead>
         {% for task in object_list %}
             <tr>
                 <td>{{ task.type }}</td>
