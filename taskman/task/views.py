@@ -22,6 +22,7 @@ from django.conf import settings
 
 class TaskList(ListView):
     model = Task
+    paginate_by = 20
 
 
 class TaskDetail(DetailView):
@@ -131,7 +132,7 @@ class NewComment(View):
 
 
 def root(request):
-    return redirect('/task/')
+    return redirect('/task/page1/')
 
 
 def serve_file(request, name):
