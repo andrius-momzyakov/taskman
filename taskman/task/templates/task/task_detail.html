@@ -5,7 +5,7 @@
 <h1>{{ object.subject }}</h1>
 <a href="{% url 'edit' object.id %}">Изменить</a>
 <p><b>Тип:</b>{{ object.type }}</p>
-<p><b>Описание:</b>{{ object.desc }}</p>
+<p><b>Описание:</b><code><pre>{{ object.desc }}</pre></code></p>
 <p><b>Заявитель:</b>{{ object.created_by }}</p>
 <p><b>Исполнитель:</b>{{ object.executor|default_if_none:"" }}</p>
 <p><b>Проект:</b>{{ object.project|default_if_none:"" }}</p>
