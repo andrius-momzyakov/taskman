@@ -25,7 +25,7 @@
             <td>{{ task.created_by }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.executor|default_if_none:"" }}</td>
-            <td>{{ object.closed }}</td>
+            <td>{{ task.closed|default_if_none:"" }}</td>
             </tr>
         {% endfor %}
     </table>
