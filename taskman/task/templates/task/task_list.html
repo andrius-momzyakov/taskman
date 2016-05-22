@@ -13,6 +13,7 @@
         <th>Автор</th>
         <th>Дата созд.</th>
         <th>Исполнитель</th>
+        <th>Закрыто</th>
         </thead>
         {% for task in object_list %}
             <tr>
@@ -24,6 +25,7 @@
             <td>{{ task.created_by }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.executor|default_if_none:"" }}</td>
+            <td>{{ object.closed }}</td>
             </tr>
         {% endfor %}
     </table>
