@@ -10,7 +10,7 @@
 <p><b>Исполнитель:</b>{{ object.executor|default_if_none:"" }}</p>
 <p><b>Проект:</b>{{ object.project|default_if_none:"" }}</p>
 <p><b>Модуль:</b>{{ object.module|default_if_none:"" }}</p>
-<p><b>Закрыто:</b>{{ object.closed }}</p>
+<p><b>Закрыто:</b>{{ object.closed|default_if_none:"" }}</p>
 {% if object.parent %}
 <p><b>Родительская задача</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
 {% endif %}
