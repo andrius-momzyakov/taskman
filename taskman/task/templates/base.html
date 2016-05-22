@@ -22,6 +22,9 @@
         {% else %}
             <td>    <A href="/accounts/login/?next=/">Войти</A></td>
         {% endif %}
+        {% if user.is_superuser %}
+            <td><a href="/admin/">Администрирование</ah></td>
+        {% endif %}
     </tr>
 </table>
 {% endblock %}
