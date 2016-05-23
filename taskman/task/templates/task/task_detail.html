@@ -12,7 +12,14 @@
 <p><b>Модуль:</b>{{ object.module|default_if_none:"" }}</p>
 <p><b>Закрыто:</b>{{ object.closed|default_if_none:"" }}</p>
 {% if object.parent %}
-<p><b>Родительская задача</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
+<p><b>Родительская задача:</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
+{% endif %}
+
+{% if children %}
+<h2>Подзадачи</h2>
+{% for child in children %}
+<p><a href="/task/detail/{{ child.id }}/">{{ child }}</a></p>
+{% endfor%}
 {% endif %}
 
 {% if attachments %}
@@ -26,11 +33,11 @@
 <h2>Комментарии:</h2>
 <table>
 {% for comment in comments%}
+    <hr>
     <tr>
         <td>{{ comment.author }}</td>
         <td>{{ comment.created }}</td>
-    </tr>
-<tr>        <td>{{ comment.body }}</td>
+        <td><pre>{{ comment.body }}</pre></td>
 </tr>
     {% endfor %}
 </table>
