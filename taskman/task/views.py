@@ -33,8 +33,10 @@ class TaskDetail(DetailView):
         context = super(TaskDetail, self).get_context_data(**kwargs)
         attachments = Attachment.objects.filter(task=self.object)
         comments = Comment.objects.filter(task=self.object)
+        children = Task.objects.filter(parent=self.object)
         context['attachments'] = attachments
         context['comments'] = comments
+        context['children'] = children
         return context
 
 
@@ -82,7 +84,6 @@ class EditTask(UpdateView):
     fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'closed',
               'close_reason', 'parent', ]
     template_name_suffix = '_update_form'
-    slug_field = 'id'
 
     def get_context_data(self, **kwargs):
         context = super(EditTask, self).get_context_data(**kwargs)
