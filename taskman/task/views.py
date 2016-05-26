@@ -20,11 +20,13 @@ from django.conf import settings
 # Create your views here.
 
 
+@method_decorator(login_required, name='dispatch')
 class TaskList(ListView):
     model = Task
     paginate_by = 20
 
 
+@method_decorator(login_required, name='dispatch')
 class TaskDetail(DetailView):
     model = Task
     slug_field = 'id'
@@ -66,15 +68,6 @@ class NewTask(View):
         return render_to_response(template_name=self.template, context={'form':form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
-
-
-'''
-class NewTask(CreateView):
-    model = Task
-    template_name_suffix = '_create_form'
-    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'created_by',
-              'created', 'parent', ]
-'''
 
 
 @method_decorator(login_required, name='dispatch')
@@ -132,10 +125,12 @@ class NewComment(View):
         return HttpResponse('Неправильно введены данные.')
 
 
+@login_required
 def root(request):
     return redirect('/task/page1/')
 
 
+@login_required
 def serve_file(request, name):
     ctype = mimetypes.guess_type(name)
     f = None
