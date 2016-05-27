@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 
 
 
-from .models import Task, Comment, Attachment
+from .models import Task, Comment, Attachment, TaskType
 from django.conf import settings
 
 # Create your views here.
@@ -47,12 +47,13 @@ class NewTaskForm(forms.ModelForm):
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'parent', ]
 
+
 @method_decorator(login_required, name='dispatch')
 class NewTask(View):
     template = 'task_create_form.html'
 
     def get(self, request, *args, **kwargs):
-        form = NewTaskForm()
+        form = NewTaskForm(initial={'type':TaskType.objects.get(short_typename='TASK').id})
         return render_to_response(template_name=self.template, context={'form':form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
