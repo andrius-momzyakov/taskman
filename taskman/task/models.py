@@ -18,8 +18,6 @@ class Task(models.Model):
         (DUPLICATE, 'Дублирует существующую'),
         (WONTFIX, 'Отменено'),
     )
-    # Важность
-    # TODO: важность
 
     subject = models.CharField(max_length=255, verbose_name='Задача')
     desc = models.TextField(verbose_name='Описание', null=True, blank=True)

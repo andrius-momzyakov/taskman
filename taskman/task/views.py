@@ -154,16 +154,16 @@ def serve_file(request, name):
 def update_task_priority(request, task_id):
     t = get_object_or_404(Task, pk=task_id)
     val=0
-#    try:
-    c = db.connection.cursor()
-    c.execute("select nextval('{}')".format(settings.PRIORITY_SEQUENCE))
-    t.priority = c.fetchone()[0]
-    t.save()
-    return redirect('/task/')
-#    except db.ProgrammingError:
-#        return render_to_response(template_name='error.html', context={
-#            'message':'Последовательность {} отсутствует в БД приложения.'.
-#                                  format(settings.PRIORITY_SEQUENCE)})
-#    except AttributeError:
-#        return render_to_response(template_name='error.html', context={'message':'Не задана '
-#                                                    'последовательность для приоритетов.'})
+    try:
+        c = db.connection.cursor()
+        c.execute("select nextval('{}')".format(settings.PRIORITY_SEQUENCE))
+        t.priority = c.fetchone()[0]
+        t.save()
+        return redirect('/task/')
+    except db.ProgrammingError:
+        return render_to_response(template_name='error.html', context={
+            'message':'Последовательность {} отсутствует в БД приложения.'.
+                                  format(settings.PRIORITY_SEQUENCE)})
+    except AttributeError:
+        return render_to_response(template_name='error.html', context={'message':'Не задана '
+                                                    'последовательность для приоритетов.'})
