@@ -5,6 +5,7 @@
 <h1>Список задач</h1>
     <table border="1" cellspacing="0">
         <thead>
+        <th>Повысить приоритет</th>
         <th>Тип карточки</th>
         <th>Предмет</th>
         <th>Действия</th>
@@ -17,7 +18,8 @@
         </thead>
         {% for task in object_list %}
             <tr>
-                <td>{{ task.type }}</td>
+            <td><a href="{% url 'priority' task.id %}">/|\</a></td>
+            <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
             <td><a href="{% url 'edit' task.id %}">Изменить</a></td>
             <td>{{ task.project|default_if_none:"" }}</td>

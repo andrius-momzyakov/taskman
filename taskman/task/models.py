@@ -38,7 +38,10 @@ class Task(models.Model):
     type = models.ForeignKey('TaskType', verbose_name='Тип')
     project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
     module = models.ForeignKey('Module', verbose_name='Модуль', null=True, blank=True)
-    # TODO manual order - для изменения приоритетов
+    priority = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
+
+    class Meta:
+        ordering = ['-priority', 'id']
 
     def __str__(self):
         return self.subject

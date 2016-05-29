@@ -1,7 +1,8 @@
 import mimetypes
 import urllib
 
-from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext
+from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext,\
+                            get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, View
 from django.core.files import File
@@ -11,8 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
-
-
+import django.db as db
 
 from .models import Task, Comment, Attachment
 from django.conf import settings
@@ -154,3 +154,21 @@ def serve_file(request, name):
     response['Content-Disposition'] = 'attachment; filename=' + \
                                       urllib.parse.quote(name.encode('utf-8'))
     return response
+
+
+def update_task_priority(request, task_id):
+    t = get_object_or_404(Task, pk=task_id)
+    val=0
+#    try:
+    c = db.connection.cursor()
+    c.execute("select nextval('{}')".format(settings.PRIORITY_SEQUENCE))
+    t.priority = c.fetchone()[0]
+    t.save()
+    return redirect('/task/')
+#    except db.ProgrammingError:
+#        return render_to_response(template_name='error.html', context={
+#            'message':'Последовательность {} отсутствует в БД приложения.'.
+#                                  format(settings.PRIORITY_SEQUENCE)})
+#    except AttributeError:
+#        return render_to_response(template_name='error.html', context={'message':'Не задана '
+#                                                    'последовательность для приоритетов.'})
