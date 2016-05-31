@@ -22,7 +22,7 @@ from . import views as v
 urlpatterns = [
     url(r'^new/$', v.NewTask.as_view(), name='new'),
     url(r'^detail/(?P<slug>[0-9]+)/$', v.TaskDetail.as_view(), name='detail'),
-    url(r'^edit/(?P<slug>[0-9]+)/$', v.EditTask.as_view(), name='edit'),
+    url(r'^edit/(?P<task_id>[0-9]+)/$', v.EditTask.as_view(), name='edit'),
     url(r'^file/(?P<name>.*)$', v.serve_file, name='file'),
     url(r'^comment/$', v.NewComment.as_view(), name='comment'),
     url(r'^attachment/$', v.NewAttachment.as_view(), name='attachment'),

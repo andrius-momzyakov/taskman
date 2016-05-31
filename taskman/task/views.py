@@ -1,6 +1,8 @@
 import mimetypes
 import urllib
 
+from datetime import datetime
+
 from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext,\
                             get_object_or_404
 from django.views.generic import ListView, DetailView
@@ -14,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 import django.db as db
 
-from .models import Task, Comment, Attachment
+from .models import Task, Comment, Attachment, TaskType
 from django.conf import settings
 
 # Create your views here.
@@ -45,24 +47,29 @@ class TaskDetail(DetailView):
 class NewTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'parent', ]
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status', 'parent', ]
 
 @method_decorator(login_required, name='dispatch')
 class NewTask(View):
     template = 'task_create_form.html'
 
     def get(self, request, *args, **kwargs):
-        form = NewTaskForm()
+        tasktype = None
+        try:
+            tasktype = TaskType.objects.get(short_typename='TASK')
+            form = NewTaskForm(initial={'type':tasktype, 'status':Task.NEW})
+        except TaskType.DoesNotExist:
+            form = NewTaskForm(initial={'type':tasktype, 'status':'NEW'})
         return render_to_response(template_name=self.template, context={'form':form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
-
 
     def post(self, request, *args, **kwargs):
         form = NewTaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
+            Task.check_status(task)
             task.save()
             return redirect(reverse('detail', args=[task.id,]))
         return render_to_response(template_name=self.template, context={'form':form},
@@ -70,21 +77,47 @@ class NewTask(View):
                                                                   .update(csrf(request))))
 
 
-@method_decorator(login_required, name='dispatch')
-class EditTask(UpdateView):
-    model = Task
-    slug_field = 'id'
-    fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'closed',
-              'close_reason', 'parent', ]
-    template_name_suffix = '_update_form'
+class EditTaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date',  'status',
+                  'closed', 'close_reason', 'parent']
 
-    def get_context_data(self, **kwargs):
-        context = super(EditTask, self).get_context_data(**kwargs)
-        attachments = Attachment.objects.filter(task=self.object)
-        comments = Comment.objects.filter(task=self.object)
+
+@method_decorator(login_required, name='dispatch')
+class EditTask(View):
+    template = 'task_update_form.html'
+
+    def add_context(self, task, context):
+        context['object'] = task
+        attachments = Attachment.objects.filter(task=task)
+        comments = Comment.objects.filter(task=task)
         context['attachments'] = attachments
         context['comments'] = comments
-        return context
+        return
+
+    def get(self, request, task_id,  *args, **kwargs):
+        task = get_object_or_404(Task, pk=task_id)
+        form = EditTaskForm(instance=task)
+        context = {'form': form}
+        self.add_context(task, context)
+        return render_to_response(template_name=self.template, context=context,
+                                  context_instance=RequestContext(request, {}
+                                                                  .update(csrf(request))))
+
+    def post(self, request, task_id, *args, **kwargs):
+        task = get_object_or_404(Task, pk=task_id)
+        form = EditTaskForm(request.POST, instance=task)
+        if form.is_valid():
+            task = form.save(commit=False)
+            Task.check_status(task)
+            task.save()
+            return redirect(reverse('detail', args=[task.id,]))
+        context = {'form': form}
+        self.add_context(task, context)
+        return render_to_response(template_name=self.template, context=context,
+                                  context_instance=RequestContext(request, {}
+                                                                  .update(csrf(request))))
 
 
 class NewAttachmentForm(forms.Form):

@@ -9,6 +9,17 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Task(models.Model):
+    # Статусы
+    NEW = 'NEW'
+    ACCEPTED = 'ACCEPTED'
+    CLOSED = 'CLOSED'
+
+    STATUSES = (
+        (NEW, 'Новая'),
+        (ACCEPTED, 'В работе'),
+        (CLOSED, 'Закрыта'),
+    )
+
     # Тип закрытия
     COMPLETE = 'CT'
     DUPLICATE = 'DU'
@@ -27,6 +38,7 @@ class Task(models.Model):
     created_by = models.ForeignKey(User, related_name='creator', verbose_name='Создал', null=True, blank=True)
     updated = models.DateTimeField(verbose_name='Когда изменена', null=True, blank=True, default=datetime.now)
     updated_by = models.ForeignKey(User, related_name='updater', verbose_name='Изменил', null=True, blank=True)
+    status = models.CharField(verbose_name='Статус', max_length=30, choices=STATUSES)
     closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
     close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True, blank=True,
                                     choices=CLOSE_REASONS)
@@ -46,6 +58,24 @@ class Task(models.Model):
 
     def get_absolute_url(self):
         return reverse('detail', kwargs={'slug': self.id})
+
+    @classmethod
+    def check_status(cls, task):
+        if task.status == Task.ACCEPTED and (not task.executor):
+            task.executor = request.user
+        if task.executor and task.status == Task.NEW:
+            task.status = Task.ACCEPTED
+        if task.status == Task.CLOSED and not task.closed:
+            task.closed = datetime.now()
+        if task.closed and task.status != Task.CLOSED:
+            task.closed = None
+        if task.status == Task.CLOSED and (not task.close_reason):
+            task.close_reason = Task.COMPLETE
+        return
+
+    def get_status_literal(self):
+        return dict(Task.STATUSES)[self.status]
+
 
 class TaskType(models.Model):
     short_typename = models.CharField(max_length=30, verbose_name='Краткое наименование для ссылок (лат.)', unique=True,
@@ -86,3 +116,4 @@ class Module(models.Model):
 
     def __str__(self):
         return self.name
+
