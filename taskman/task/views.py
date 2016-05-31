@@ -200,3 +200,6 @@ def update_task_priority(request, task_id):
     except AttributeError:
         return render_to_response(template_name='error.html', context={'message':'Не задана '
                                                     'последовательность для приоритетов.'})
+    except:
+        return render_to_response(template_name='error.html', context={'message':'Функция '
+                                                    'недоступна для данного бэкенда БД.'})
