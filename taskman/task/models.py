@@ -68,7 +68,7 @@ class Task(models.Model):
         if task.status == Task.CLOSED and not task.closed:
             task.closed = datetime.now()
         if task.closed and task.status != Task.CLOSED:
-            task.closed = None
+            task.status = Task.CLOSED
         if task.status == Task.CLOSED and (not task.close_reason):
             task.close_reason = Task.COMPLETE
         return
