@@ -37,14 +37,12 @@
     <table>
         <tr>
             <td><a href="/task/page1/">&lt;На первую&gt;</a></td>
-            {% if object_list.has_previuous %}
-                <td><a href="page{{ page_obj.previuos_page_number }}/">&lt;На
-                    предыдущую&gt;</a></td>
+            {% if page_obj.has_previous %}
+                <td><a href="/task/page{{ page_obj.previous_page_number }}/">&lt;&lt;--</a></td>
             {% endif %}
             <td>&lt;Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}&gt; </td>
-            {% if object_list.has_next %}
-                <td><a href="/task/page{{ page_obj.next_page_number }}/">&lt;На
-                    следующую&gt;</a></td>
+            {% if page_obj.has_next %}
+                <td><a href="/task/page{{ page_obj.next_page_number }}/">--&gt;&gt;</a></td>
             {% endif %}
             <td><a href="/task/page{{ page_obj.paginator.num_pages }}/">&lt;На
                 последнюю&gt;</a></td>
