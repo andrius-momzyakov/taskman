@@ -49,6 +49,7 @@ class NewTaskForm(forms.ModelForm):
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status', 'parent', ]
 
+
 @method_decorator(login_required, name='dispatch')
 class NewTask(View):
     template = 'task_create_form.html'
