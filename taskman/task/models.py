@@ -42,16 +42,15 @@ class Task(models.Model):
     closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
     close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True, blank=True,
                                     choices=CLOSE_REASONS)
-    #attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True, null=True)
     parent = models.ForeignKey('self', null=True, blank=True)
     executor = models.ForeignKey(User, related_name='executor', null=True, blank=True)
     type = models.ForeignKey('TaskType', verbose_name='Тип')
     project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
     module = models.ForeignKey('Module', verbose_name='Модуль', null=True, blank=True)
-    priority = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
+    #priority = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
 
-    class Meta:
-        ordering = ['-priority', 'id']
+  #  class Meta:
+  #      ordering = ['-priority', 'id']
 
     def __str__(self):
         return self.subject
@@ -116,4 +115,46 @@ class Module(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class TaskUserPriority(models.Model):
+    '''
+    Primary key's value is used as priority value
+    '''
+    task = models.ForeignKey(Task, verbose_name='Задача', )
+    user = models.ForeignKey(User, verbose_name='Пользователь')
+
+
+class TaskView(models.Model):
+    subject = models.CharField(max_length=255, verbose_name='Задача')
+    desc = models.TextField(verbose_name='Описание', null=True, blank=True)
+    deadline_date = models.DateField(verbose_name='Крайний срок', null=True, blank=True)
+    notify_before = models.IntegerField(verbose_name='Уведомить за (дней)', null=True, blank=True)
+    created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True,
+                                   default=datetime.now)
+    created_by = models.ForeignKey(User, related_name='vcreator', on_delete=models.DO_NOTHING,
+                                   verbose_name='Создал', null=True, blank=True)
+    updated = models.DateTimeField(verbose_name='Когда изменена', null=True, blank=True,
+                                   default=datetime.now)
+    updated_by = models.ForeignKey(User, related_name='vupdater', on_delete=models.DO_NOTHING,
+                                   verbose_name='Изменил', null=True, blank=True)
+    status = models.CharField(verbose_name='Статус', max_length=30, choices=Task.STATUSES)
+    closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
+    close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True,
+                                    blank=True, choices=Task.CLOSE_REASONS)
+    parent = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
+    executor = models.ForeignKey(User, related_name='vexecutor', on_delete=models.DO_NOTHING,
+                                 null=True, blank=True)
+    type = models.ForeignKey('TaskType', verbose_name='Тип', on_delete=models.DO_NOTHING)
+    project = models.ForeignKey('Project', verbose_name='Проект', on_delete=models.DO_NOTHING,
+                                null=True, blank=True)
+    module = models.ForeignKey('Module', verbose_name='Модуль', on_delete=models.DO_NOTHING,
+                               null=True, blank=True)
+    prty = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
+
+    class Meta:
+        managed = False
+        db_table = 'task_vtask'
+        ordering = ['-prty']
+
 

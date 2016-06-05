@@ -16,7 +16,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 import django.db as db
 
-from .models import Task, Comment, Attachment, TaskType
+from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from django.conf import settings
 
 # Create your views here.
@@ -24,7 +24,7 @@ from django.conf import settings
 
 @method_decorator(login_required, name='dispatch')
 class TaskList(ListView):
-    model = Task
+    model = TaskView
     paginate_by = 20
 
 
@@ -135,7 +135,7 @@ class NewAttachment(View):
             att = Attachment(task=Task.objects.get(pk=int(form.cleaned_data['task']))
                              , file=request.FILES['file'])
             att.save()
-            return redirect('/task/detail/{}/'.format(form.cleaned_data['task']))
+            return redirect(reverse('detail', args=[form.cleaned_data['task'],]))
         return HttpResponse('Неправильно введены данные.')
 
 
@@ -155,13 +155,13 @@ class NewComment(View):
             comment.body = form.cleaned_data['body']
             comment.task = Task.objects.get(pk=int(form.cleaned_data['task']))
             comment.save()
-            return redirect('/task/detail/{}/'.format(form.cleaned_data['task']))
+            return redirect(reverse('detail', args=[form.cleaned_data['task'],]))
         return HttpResponse('Неправильно введены данные.')
 
 
 @login_required
 def root(request):
-    return redirect('/task/page1/')
+    return redirect(reverse('home', args=[1,]))
 
 
 @login_required
@@ -184,23 +184,11 @@ def serve_file(request, name):
                                       urllib.parse.quote(name.encode('utf-8'))
     return response
 
-
+@login_required
 def update_task_priority(request, task_id):
     t = get_object_or_404(Task, pk=task_id)
-    val=0
-    try:
-        c = db.connection.cursor()
-        c.execute("select nextval('{}')".format(settings.PRIORITY_SEQUENCE))
-        t.priority = c.fetchone()[0]
-        t.save()
-        return redirect('/task/')
-    except db.ProgrammingError:
-        return render_to_response(template_name='error.html', context={
-            'message':'Последовательность {} отсутствует в БД приложения.'.
-                                  format(settings.PRIORITY_SEQUENCE)})
-    except AttributeError:
-        return render_to_response(template_name='error.html', context={'message':'Не задана '
-                                                    'последовательность для приоритетов.'})
-    except:
-        return render_to_response(template_name='error.html', context={'message':'Функция '
-                                                    'недоступна для данного бэкенда БД.'})
+    u = request.user
+    old_priorities_list = TaskUserPriority.objects.filter(task=t, user=u).delete()
+    new_priority = TaskUserPriority(task=t, user=u)
+    new_priority.save()
+    return redirect(reverse('home', args=[1,]))
