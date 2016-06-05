@@ -1,3 +1,4 @@
 *.pyc
 taskman/taskman/settings.py
 .idea/
+py35/
