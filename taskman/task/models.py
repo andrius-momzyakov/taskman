@@ -157,4 +157,8 @@ class TaskView(models.Model):
         db_table = 'task_vtask'
         ordering = ['-prty']
 
+    def get_status_literal(self):
+        return dict(Task.STATUSES)[self.status]
+
+
 
