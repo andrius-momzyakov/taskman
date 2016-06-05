@@ -8,11 +8,11 @@
 <p><b>Описание:</b><code><pre>{{ object.desc }}</pre></code></p>
 <p><b>Заявитель:</b>{{ object.created_by }}</p>
 <p><b>Исполнитель:</b>{{ object.executor|default_if_none:"" }}</p>
-<p><b>Крайний срок:</b>{{ object.deadline_date|default_if_none:"" }}</p>
+<p><b>Крайний срок:</b>{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</p>
 <p><b>Проект:</b>{{ object.project|default_if_none:"" }}</p>
 <p><b>Модуль:</b>{{ object.module|default_if_none:"" }}</p>
 <p><b>Статус:</b>{{ object.get_status_literal|default_if_none:"" }}</p>
-<p><b>Закрыто:</b>{{ object.closed|default_if_none:"" }}</p>
+<p><b>Закрыто:</b>{{ object.closed|date:"d.m.Y H:i"|default_if_none:"" }}</p>
 {% if object.parent %}
 <p><b>Родительская задача:</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
 {% endif %}
@@ -38,7 +38,7 @@
 
     <tr>
         <td>{{ comment.author }}</td>
-        <td>{{ comment.created }}</td>
+        <td>{{ comment.created|date:"d.m.Y" }}</td>
         <td><pre>{{ comment.body }}</pre></td>
 </tr>
     {% endfor %}

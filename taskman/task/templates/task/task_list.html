@@ -19,17 +19,17 @@
         </thead>
         {% for task in object_list %}
             <tr>
-            <td><a href="{% url 'priority' task.id %}">/|\</a></td>
+            <td><a href="{% url 'priority' task.id %}">Вверх</a></td>
             <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
             <td><a href="{% url 'edit' task.id %}">Изменить</a></td>
             <td>{{ task.project|default_if_none:"" }}</td>
             <td>{{ task.module|default_if_none:"" }}</td>
             <td>{{ task.created_by }}</td>
-            <td>{{ task.created }}</td>
+            <td>{{ task.created|default_if_none:""|date:"d.m.Y H:i" }}</td>
             <td>{{ task.executor|default_if_none:"" }}</td>
             <td>{{ task.get_status_literal|default_if_none:"" }}</td>
-            <td>{{ task.closed|default_if_none:"" }}</td>
+            <td>{{ task.closed|date:"d.m.Y H:i"|default_if_none:"" }}</td>
             </tr>
         {% endfor %}
     </table>
