@@ -25,7 +25,7 @@
             <td><a href="{% url 'edit' task.id %}">Изменить</a></td>
             <td>{{ task.project|default_if_none:"" }}</td>
             <td>{{ task.module|default_if_none:"" }}</td>
-            <td>{{ task.created_by }}</td>
+            <td>{{ task.created_by|default_if_none:"" }}</td>
             <td>{{ task.created|default_if_none:""|date:"d.m.Y H:i" }}</td>
             <td>{{ task.executor|default_if_none:"" }}</td>
             <td>{{ task.get_status_literal|default_if_none:"" }}</td>
