@@ -21,7 +21,7 @@
 {% if children %}
 <h2>Подзадачи</h2>
 {% for child in children %}
-<p><a href="/task/detail/{{ child.id }}/">{{ child }}</a></p>
+<p><a href="/task/detail/{{ child.id }}/">{{ child }}</a> - [{{ child.get_status_literal }}]</p>
 {% endfor%}
 {% endif %}
 
