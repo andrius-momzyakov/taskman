@@ -10,7 +10,8 @@
 <table>
     <tr>
         <td><a href="{% url 'new' %}">Новая задача</a></td>
-        <td><a href="{% url 'home' '1' %}">В список</a></td>
+        <td><a href="{% url 'home' '1' %}?status_in=open">Текущие</a></td>
+        <td><a href="{% url 'home' '1' %}">Все</a></td>
         {% if user.is_authenticated %}
             <td>
             <A href="/accounts/logout/?next=/">Выйти</A>
