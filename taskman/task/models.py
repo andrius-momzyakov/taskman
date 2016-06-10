@@ -160,5 +160,8 @@ class TaskView(models.Model):
     def get_status_literal(self):
         return dict(Task.STATUSES)[self.status]
 
+    def __str__(self):
+        return self.subject
+
 
 

@@ -3,8 +3,8 @@ import urllib
 
 from datetime import datetime
 
-from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext,\
-                            get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext, \
+    get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, View
 from django.core.files import File
@@ -15,17 +15,44 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 import django.db as db
+from django.db.models import Q
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from django.conf import settings
+
 
 # Create your views here.
 
 
 @method_decorator(login_required, name='dispatch')
 class TaskList(ListView):
+    # request.GET.urlencode()
     model = TaskView
     paginate_by = 20
+    template_name = 'taskview_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskList, self).get_context_data(**kwargs)
+        get_qry = self.request.GET.urlencode()
+        status_qry_val = self.request.GET.get('status_in')
+        qs = None
+        if status_qry_val == 'open':
+            qs = TaskView.objects.filter(~Q(status=Task.CLOSED))
+        elif status_qry_val == 'new':
+            qs = TaskView.objects.filter(Q(status=Task.NEW))
+        elif status_qry_val == 'accepted':
+            qs = TaskView.objects.filter(Q(status=Task.ACCEPTED))
+        elif status_qry_val == 'closed':
+            qs = TaskView.objects.filter(Q(status=Task.CLOSED))
+        else:
+            qs = TaskView.objects.all()
+        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(qs, self.paginate_by)
+        if get_qry:
+            context['get_qry'] = '?' + get_qry
+        return context
+
+
+# context['get_query_string'] = self.request.META.get('QUERY_STRING')
 
 
 @method_decorator(login_required, name='dispatch')
@@ -58,10 +85,10 @@ class NewTask(View):
         tasktype = None
         try:
             tasktype = TaskType.objects.get(short_typename='TASK')
-            form = NewTaskForm(initial={'type':tasktype, 'status':Task.NEW})
+            form = NewTaskForm(initial={'type': tasktype, 'status': Task.NEW})
         except TaskType.DoesNotExist:
-            form = NewTaskForm(initial={'type':tasktype, 'status':'NEW'})
-        return render_to_response(template_name=self.template, context={'form':form},
+            form = NewTaskForm(initial={'type': tasktype, 'status': 'NEW'})
+        return render_to_response(template_name=self.template, context={'form': form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
 
@@ -72,8 +99,8 @@ class NewTask(View):
             task.created_by = request.user
             Task.check_status(task)
             task.save()
-            return redirect(reverse('detail', args=[task.id,]))
-        return render_to_response(template_name=self.template, context={'form':form},
+            return redirect(reverse('detail', args=[task.id, ]))
+        return render_to_response(template_name=self.template, context={'form': form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
 
@@ -81,7 +108,7 @@ class NewTask(View):
 class EditTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date',  'status',
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
                   'closed', 'close_reason', 'parent']
 
 
@@ -97,7 +124,7 @@ class EditTask(View):
         context['comments'] = comments
         return
 
-    def get(self, request, task_id,  *args, **kwargs):
+    def get(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
         form = EditTaskForm(instance=task)
         context = {'form': form}
@@ -113,7 +140,7 @@ class EditTask(View):
             task = form.save(commit=False)
             Task.check_status(task)
             task.save()
-            return redirect(reverse('detail', args=[task.id,]))
+            return redirect(reverse('detail', args=[task.id, ]))
         context = {'form': form}
         self.add_context(task, context)
         return render_to_response(template_name=self.template, context=context,
@@ -128,14 +155,13 @@ class NewAttachmentForm(forms.Form):
 
 @method_decorator(login_required, name='dispatch')
 class NewAttachment(View):
-
     def post(self, request, *args, **kwargs):
         form = NewAttachmentForm(request.POST, request.FILES)
         if form.is_valid():
             att = Attachment(task=Task.objects.get(pk=int(form.cleaned_data['task']))
                              , file=request.FILES['file'])
             att.save()
-            return redirect(reverse('detail', args=[form.cleaned_data['task'],]))
+            return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
         return HttpResponse('Неправильно введены данные.')
 
 
@@ -143,25 +169,25 @@ class NewCommentForm(forms.Form):
     task = forms.IntegerField()
     body = forms.CharField(widget=forms.Textarea)
 
+
 @method_decorator(login_required, name='dispatch')
 class NewComment(View):
-
     def post(self, request, *args, **kwargs):
         form = NewCommentForm(request.POST)
 
         if form.is_valid():
             comment = Comment()
-            comment.author = request.user #form.cleaned_data['author']
+            comment.author = request.user  # form.cleaned_data['author']
             comment.body = form.cleaned_data['body']
             comment.task = Task.objects.get(pk=int(form.cleaned_data['task']))
             comment.save()
-            return redirect(reverse('detail', args=[form.cleaned_data['task'],]))
+            return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
         return HttpResponse('Неправильно введены данные.')
 
 
 @login_required
 def root(request):
-    return redirect(reverse('home', args=[1,]))
+    return redirect(reverse('home', args=[1, ]))
 
 
 @login_required
@@ -169,20 +195,21 @@ def serve_file(request, name):
     ctype = mimetypes.guess_type(name)
     f = None
     f = open(settings.MEDIA_ROOT + name, 'rb')
-    #except FileNotFoundError:
+    # except FileNotFoundError:
     #    return HttpResponse('Файл не найден')
     if not f:
         return HttpResponse('Файл не найден или не существует.')
     data = File(f)
     response = HttpResponse(data, content_type=ctype)
     # todo: Сделать на Streaming response
-    #chunk_size = 8192
-    #response = StreamingHttpResponse(FileWrapper(f, chunk_size),
+    # chunk_size = 8192
+    # response = StreamingHttpResponse(FileWrapper(f, chunk_size),
     #                       content_type=mimetypes.guess_type(f)[0])
-    #response['Content-Length'] = os.path.getsize(the_file)
+    # response['Content-Length'] = os.path.getsize(the_file)
     response['Content-Disposition'] = 'attachment; filename=' + \
                                       urllib.parse.quote(name.encode('utf-8'))
     return response
+
 
 @login_required
 def update_task_priority(request, task_id):
@@ -191,4 +218,4 @@ def update_task_priority(request, task_id):
     old_priorities_list = TaskUserPriority.objects.filter(task=t, user=u).delete()
     new_priority = TaskUserPriority(task=t, user=u)
     new_priority.save()
-    return redirect(reverse('home', args=[1,]))
+    return redirect(reverse('home', args=[1, ]))

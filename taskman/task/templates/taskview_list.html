@@ -36,16 +36,21 @@
     <p></p>
     <table>
         <tr>
-            <td><a href="/task/page1/">&lt;На первую&gt;</a></td>
+            <td><a href="/task/page1/{{ get_qry }}">&lt;На первую&gt;</a></td>
             {% if page_obj.has_previous %}
-                <td><a href="/task/page{{ page_obj.previous_page_number }}/">&lt;&lt;--</a></td>
+                <td><a href="/task/page{{ page_obj.previous_page_number }}/{{ get_qry }}">&lt;&lt;--</a></td>
             {% endif %}
             <td>&lt;Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}&gt; </td>
             {% if page_obj.has_next %}
-                <td><a href="/task/page{{ page_obj.next_page_number }}/">--&gt;&gt;</a></td>
+                <td><a href="/task/page{{ page_obj.next_page_number }}/{{ get_qry }}">--&gt;&gt;</a></td>
             {% endif %}
-            <td><a href="/task/page{{ page_obj.paginator.num_pages }}/">&lt;На
-                последнюю&gt;</a></td>
+            {% if page_obj.paginator.num_pages %}
+                <td><a href="/task/page{{ page_obj.paginator.num_pages }}/{{ get_qry }}">&lt;На
+                    последнюю&gt;</a></td>
+            {% else %}
+                <td><a href="/task/page1/{{ get_qry }}">&lt;На
+                    последнюю&gt;</a></td>
+            {% endif %}
         </tr>
     </table>
 {% endblock %}
