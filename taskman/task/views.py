@@ -187,7 +187,7 @@ class NewComment(View):
 
 @login_required
 def root(request):
-    return redirect(reverse('home', args=[1, ]))
+    return redirect(reverse('home', args=[1, ])  + '?status_in=open')
 
 
 @login_required
