@@ -1,4 +1,4 @@
-create or replace view task_vtmp as select max(p.id) prty, p.user_id, p.task_id
+create or replace view task_vtmp as select max(p.priority) prty, p.user_id, p.task_id
 from task_taskuserpriority p
 group by p.user_id, p.task_id;
 

@@ -3,7 +3,7 @@ select t.*, tup.prty
 from task_task t left outer join
 ( select t.prty, t.user_id, t.task_id
   from
-    (select max(p.id) prty, p.user_id user_id, p.task_id task_id from task_taskuserpriority p
+    (select max(p.priority) prty, p.user_id user_id, p.task_id task_id from task_taskuserpriority p
      group by p.user_id, p.task_id) as t
 ) as tup on t.id = tup.task_id;
 

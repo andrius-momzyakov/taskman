@@ -16,6 +16,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 import django.db as db
 from django.db.models import Q
+from django.db.models.expressions import F
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from django.conf import settings
@@ -212,10 +213,15 @@ def serve_file(request, name):
 
 
 @login_required
-def update_task_priority(request, task_id):
+def update_task_priority(request, task_id=None, increase=None):
     t = get_object_or_404(Task, pk=task_id)
     u = request.user
-    old_priorities_list = TaskUserPriority.objects.filter(task=t, user=u).delete()
+    TaskUserPriority.objects.filter(task=t, user=u).delete()
     new_priority = TaskUserPriority(task=t, user=u)
+    new_priority.save()
+    if increase == 'down':
+        new_priority.priority = -1 * F('id')
+    else:
+        new_priority.priority = F('id')
     new_priority.save()
     return redirect(reverse('home', args=[1, ]))

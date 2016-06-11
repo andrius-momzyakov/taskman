@@ -1,0 +1,1 @@
+﻿update task_taskuserpriority set priority = id;

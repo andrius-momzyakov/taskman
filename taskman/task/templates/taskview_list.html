@@ -5,7 +5,7 @@
 <h1>Список задач</h1>
     <table border="1" cellspacing="0">
         <thead>
-        <th>Повысить приоритет</th>
+        <th>Изменить приоритет</th>
         <th>Тип карточки</th>
         <th>Предмет</th>
         <th>Действия</th>
@@ -19,7 +19,9 @@
         </thead>
         {% for task in object_list %}
             <tr>
-            <td><a href="{% url 'priority' task.id %}">Вверх</a></td>
+            <td><a href="{% url 'priority' task.id %}">Вверх</a>
+                <a href="{% url 'priority_down' task_id=task.id increase='down' %}">Вниз</a>
+            </td>
             <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
             <td><a href="{% url 'edit' task.id %}">Изменить</a></td>

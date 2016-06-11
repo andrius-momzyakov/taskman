@@ -47,10 +47,6 @@ class Task(models.Model):
     type = models.ForeignKey('TaskType', verbose_name='Тип')
     project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
     module = models.ForeignKey('Module', verbose_name='Модуль', null=True, blank=True)
-    #priority = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
-
-  #  class Meta:
-  #      ordering = ['-priority', 'id']
 
     def __str__(self):
         return self.subject
@@ -121,6 +117,7 @@ class TaskUserPriority(models.Model):
     '''
     Primary key's value is used as priority value
     '''
+    priority = models.IntegerField(verbose_name='Значение приоритета', null=True, blank=True)
     task = models.ForeignKey(Task, verbose_name='Задача', )
     user = models.ForeignKey(User, verbose_name='Пользователь')
 
