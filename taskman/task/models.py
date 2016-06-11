@@ -32,7 +32,7 @@ class Task(models.Model):
 
     subject = models.CharField(max_length=255, verbose_name='Задача')
     desc = models.TextField(verbose_name='Описание', null=True, blank=True)
-    deadline_date = models.DateField(verbose_name='Крайний срок', null=True, blank=True)
+    deadline_date = models.DateTimeField(verbose_name='Крайний срок', null=True, blank=True)
     notify_before = models.IntegerField(verbose_name='Уведомить за (дней)', null=True, blank=True)
     created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True, default=datetime.now)
     created_by = models.ForeignKey(User, related_name='creator', verbose_name='Создал', null=True, blank=True)
@@ -55,7 +55,7 @@ class Task(models.Model):
         return reverse('detail', kwargs={'slug': self.id})
 
     @classmethod
-    def check_status(cls, task):
+    def check_status(cls, task, request, *args, **kwargs):
         if task.status == Task.ACCEPTED and (not task.executor):
             task.executor = request.user
         if task.executor and task.status == Task.NEW:
@@ -125,7 +125,7 @@ class TaskUserPriority(models.Model):
 class TaskView(models.Model):
     subject = models.CharField(max_length=255, verbose_name='Задача')
     desc = models.TextField(verbose_name='Описание', null=True, blank=True)
-    deadline_date = models.DateField(verbose_name='Крайний срок', null=True, blank=True)
+    deadline_date = models.DateTimeField(verbose_name='Крайний срок', null=True, blank=True)
     notify_before = models.IntegerField(verbose_name='Уведомить за (дней)', null=True, blank=True)
     created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True,
                                    default=datetime.now)

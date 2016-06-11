@@ -9,10 +9,10 @@
 {% block menu %}
 <table>
     <tr>
-        <td><a href="{% url 'new' %}">Новая задача</a></td>
-        <td><a href="{% url 'home' '1' %}?status_in=open">Текущие</a></td>
-        <td><a href="{% url 'home' '1' %}">Все</a></td>
         {% if user.is_authenticated %}
+            <td><a href="{% url 'new' %}">Новая задача</a></td>
+            <td><a href="{% url 'home' '1' %}?status_in=open">Текущие</a></td>
+            <td><a href="{% url 'home' '1' %}">Все</a></td>
             <td>
             <A href="/accounts/logout/?next=/">Выйти</A>
                 </td>
@@ -21,6 +21,8 @@
                 пароль</A>
             </td>
         {% else %}
+            <td><a href="{% url 'anonymous_home' '1' %}?status_in=open">Текущие</a></td>
+            <td><a href="{% url 'anonymous_home' '1' %}">Все</a></td>
             <td>    <A href="/accounts/login/?next=/">Войти</A></td>
         {% endif %}
         {% if user.is_superuser %}

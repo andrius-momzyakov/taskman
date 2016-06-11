@@ -24,13 +24,18 @@ from django.conf import settings
 
 # Create your views here.
 
-
 @method_decorator(login_required, name='dispatch')
 class TaskList(ListView):
     # request.GET.urlencode()
     model = TaskView
     paginate_by = 20
     template_name = 'taskview_list.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return redirect(reverse('anonymous_home', args=[1, ]) + request.GET.urlencode())
+        #return HttpResponse(request.GET.urlencode())
+        return super(TaskList, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(TaskList, self).get_context_data(**kwargs)
@@ -53,10 +58,17 @@ class TaskList(ListView):
         return context
 
 
-# context['get_query_string'] = self.request.META.get('QUERY_STRING')
+class AnonymousTaskList(TaskList):
+    '''
+    Task list for anonymous user
+    '''
+    model = Task
+    template_name = 'anonymoustask_list.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        return super(TaskList, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(login_required, name='dispatch')
 class TaskDetail(DetailView):
     model = Task
     slug_field = 'id'
@@ -139,7 +151,7 @@ class EditTask(View):
         form = EditTaskForm(request.POST, instance=task)
         if form.is_valid():
             task = form.save(commit=False)
-            Task.check_status(task)
+            Task.check_status(task, request)
             task.save()
             return redirect(reverse('detail', args=[task.id, ]))
         context = {'form': form}
@@ -186,8 +198,10 @@ class NewComment(View):
         return HttpResponse('Неправильно введены данные.')
 
 
-@login_required
+#@login_required
 def root(request):
+    if not request.user.is_authenticated():
+        return redirect(reverse('anonymous_home', args=[1, ])  + '?status_in=open')
     return redirect(reverse('home', args=[1, ])  + '?status_in=open')
 
 
@@ -196,17 +210,11 @@ def serve_file(request, name):
     ctype = mimetypes.guess_type(name)
     f = None
     f = open(settings.MEDIA_ROOT + name, 'rb')
-    # except FileNotFoundError:
-    #    return HttpResponse('Файл не найден')
     if not f:
         return HttpResponse('Файл не найден или не существует.')
     data = File(f)
     response = HttpResponse(data, content_type=ctype)
     # todo: Сделать на Streaming response
-    # chunk_size = 8192
-    # response = StreamingHttpResponse(FileWrapper(f, chunk_size),
-    #                       content_type=mimetypes.guess_type(f)[0])
-    # response['Content-Length'] = os.path.getsize(the_file)
     response['Content-Disposition'] = 'attachment; filename=' + \
                                       urllib.parse.quote(name.encode('utf-8'))
     return response
@@ -224,4 +232,4 @@ def update_task_priority(request, task_id=None, increase=None):
     else:
         new_priority.priority = F('id')
     new_priority.save()
-    return redirect(reverse('home', args=[1, ]))
+    return redirect(reverse('home', args=[1, ]) + '?' + request.GET.urlencode())

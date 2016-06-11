@@ -5,10 +5,8 @@
 <h1>Список задач</h1>
     <table border="1" cellspacing="0">
         <thead>
-        <th>Изменить приоритет</th>
         <th>Тип карточки</th>
         <th>Предмет</th>
-        <th>Действия</th>
         <th>Проект</th>
         <th>Модуль</th>
         <th>Автор</th>
@@ -19,13 +17,8 @@
         </thead>
         {% for task in object_list %}
             <tr>
-            <td><a href="{% url 'priority' task.id %}{{ get_qry }}">Вверх</a>
-                <a href="{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}">
-                    Вниз</a>
-            </td>
             <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
-            <td><a href="{% url 'edit' task.id %}">Изменить</a></td>
             <td>{{ task.project|default_if_none:"" }}</td>
             <td>{{ task.module|default_if_none:"" }}</td>
             <td>{{ task.created_by|default_if_none:"" }}</td>
@@ -39,21 +32,21 @@
     <p></p>
     <table>
         <tr>
-            <td><a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На первую&gt;</a></td>
+            <td><a href="{% url 'anonymous_home' 1 %}{{ get_qry }}">&lt;На первую&gt;</a></td>
             {% if page_obj.has_previous %}
-                <td><a
-                        href="{% url 'home' page_obj.previous_page_number %}{{ get_qry }}">&lt;&lt;--</a></td>
+                <td><a href="{% url 'anonymous_home' page_obj.previous_page_number %}{{ get_qry }}">&lt;&lt;--</a></td>
             {% endif %}
             <td>&lt;Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}&gt; </td>
             {% if page_obj.has_next %}
-                <td><a href="{% url 'home' page_obj.next_page_number %}/{{ get_qry }}">--&gt;
-                    &gt;</a></td>
+                <td><a
+                        href="{% url 'anonymous_home' page_obj.next_page_number %}{{ get_qry }}">--&gt;&gt;</a></td>
             {% endif %}
             {% if page_obj.paginator.num_pages %}
-                <td><a href="{% url 'home' page_obj.paginator.num_pages %}{{ get_qry }}">&lt;На
+                <td><a
+                        href="{% url 'anonymous_home' page_obj.paginator.num_pages %}{{ get_qry }}">&lt;На
                     последнюю&gt;</a></td>
             {% else %}
-                <td><a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На
+                <td><a href="{% url 'anonymous_home' 1 %}{{ get_qry }}">&lt;На
                     последнюю&gt;</a></td>
             {% endif %}
         </tr>
