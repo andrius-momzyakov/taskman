@@ -24,7 +24,6 @@ from django.conf import settings
 
 # Create your views here.
 
-@method_decorator(login_required, name='dispatch')
 class TaskList(ListView):
     # request.GET.urlencode()
     model = TaskView
