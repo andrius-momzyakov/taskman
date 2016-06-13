@@ -5,7 +5,7 @@
 <h1>Список задач</h1>
     <table border="1" cellspacing="0">
         <thead>
-        <th>Изменить приоритет</th>
+        <th>Изменить<br>приоритет</th>
         <th>Тип карточки</th>
         <th>Предмет</th>
         <th>Действия</th>
@@ -19,9 +19,14 @@
         </thead>
         {% for task in object_list %}
             <tr>
-            <td><a href="{% url 'priority' task.id %}{{ get_qry }}">Вверх</a>
+            <td>
+                <!--<a href="{% url 'priority' task.id %}{{ get_qry }}">Вверх</a>
                 <a href="{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}">
-                    Вниз</a>
+                    Вниз</a>-->
+                <button type="button" style="border-radius:30%;height:125%;"
+                        onclick="parent.location='{% url 'priority' task.id %}{{ get_qry }}'">&#9650;</button>
+                <button type="button" style="border-radius:30%;height:125%;"
+                        onclick="parent.location='{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}'">&#9660;</button>
             </td>
             <td>{{ task.type }}</td>
             <td><a href="{% url 'detail' task.id %}">{{ task.subject }}</a></td>
@@ -39,22 +44,43 @@
     <p></p>
     <table>
         <tr>
-            <td><a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На первую&gt;</a></td>
+            <td>
+                <!--<a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На первую&gt;</a>-->
+                <button type="button" onclick="parent.location='{% url 'home' 1 %}{{ get_qry }}'"
+                style="height:125%;">&#10094;&#10094;</button>
+            </td>
             {% if page_obj.has_previous %}
-                <td><a
-                        href="{% url 'home' page_obj.previous_page_number %}{{ get_qry }}">&lt;&lt;--</a></td>
+                <td>
+                    <!--<a
+                        href="{% url 'home' page_obj.previous_page_number %}{{ get_qry
+                        }}">&lt;&lt;--</a>-->
+                    <button type="button" style="height:120%"
+                            onclick="parent.location='{% url 'home' page_obj.previous_page_number %}{{ get_qry }}'">&#10094;</button>
+                </td>
             {% endif %}
             <td>&lt;Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}&gt; </td>
             {% if page_obj.has_next %}
-                <td><a href="{% url 'home' page_obj.next_page_number %}/{{ get_qry }}">--&gt;
-                    &gt;</a></td>
+                <td>
+                    <!--<a href="{% url 'home' page_obj.next_page_number %}/{{ get_qry }}">--&gt;
+                    &gt;</a>-->
+                    <button type="button" style="height:120%"
+                            onclick="parent.location='{% url 'home' page_obj.next_page_number %}{{ get_qry }}'">&#10095;</button>
+                </td>
             {% endif %}
             {% if page_obj.paginator.num_pages %}
-                <td><a href="{% url 'home' page_obj.paginator.num_pages %}{{ get_qry }}">&lt;На
-                    последнюю&gt;</a></td>
+                <td>
+                    <!--<a href="{% url 'home' page_obj.paginator.num_pages %}{{ get_qry }}">&lt;На
+                    последнюю&gt;</a>-->
+              <button type="button" onclick="parent.location='{% url 'home' page_obj.paginator.num_pages %}{{ get_qry }}'"
+                style="height:125%;">&#10095;&#10095;</button>
+                </td>
             {% else %}
-                <td><a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На
-                    последнюю&gt;</a></td>
+                <td>
+                    <!--<a href="{% url 'home' 1 %}{{ get_qry }}">&lt;На
+                    последнюю&gt;</a>-->
+              <button type="button" onclick="parent.location='{% url 'home' 1 %}{{ get_qry }}'"
+                style="height:125%;">&#10095;&#10095;</button>
+                </td>
             {% endif %}
         </tr>
     </table>
