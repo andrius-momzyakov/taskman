@@ -109,7 +109,7 @@ class NewTask(View):
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
-            Task.check_status(task)
+            Task.check_status(task, request)
             task.save()
             return redirect(reverse('detail', args=[task.id, ]))
         return render_to_response(template_name=self.template, context={'form': form},

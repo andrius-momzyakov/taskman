@@ -23,9 +23,9 @@
                 <!--<a href="{% url 'priority' task.id %}{{ get_qry }}">Вверх</a>
                 <a href="{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}">
                     Вниз</a>-->
-                <button type="button" style="border-radius:30%;height:125%;"
+                <button type="button" style="border-radius:30%;height:125%;" title="На верх списка"
                         onclick="parent.location='{% url 'priority' task.id %}{{ get_qry }}'">&#9650;</button>
-                <button type="button" style="border-radius:30%;height:125%;"
+                <button type="button" style="border-radius:30%;height:125%;" title="В низ списка"
                         onclick="parent.location='{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}'">&#9660;</button>
             </td>
             <td>{{ task.type }}</td>
