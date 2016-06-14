@@ -62,7 +62,7 @@ class AnonymousTaskList(TaskList):
     Task list for anonymous user
     '''
     model = Task
-    template_name = 'anonymoustask_list.html'
+    template_name = 'taskview_list.html'
 
     def dispatch(self, request, *args, **kwargs):
         return super(TaskList, self).dispatch(request, *args, **kwargs)
