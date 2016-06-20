@@ -2,7 +2,7 @@
 
 {% block title %}Список задач{% endblock %}
 {% block content %}
-<form action="" method="post">{% csrf_token %}
+<form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Save" />
 </form>
@@ -14,12 +14,13 @@
     {% endfor %}
 {% endif %}
 
+<!--
 <form enctype="multipart/form-data" method="post" action="{% url 'attachment' %}">{% csrf_token %}
     <input type="hidden" id="id_task" name="task" value="{{ object.id }}">
     <p><label for="id_file">Имя файла (до 255 букв) (*):</label><input id="id_file" name="file" type="file" /></p>
     <input type="submit" value="Save" />
 </form>
-
+-->
 <h2>Комментарии:</h2>
 {% if comments %}
 <table>
@@ -34,6 +35,7 @@
 </table>
 {% endif %}
 
+<!--
 <form action="{% url 'comment' %}" method="post">{% csrf_token %}
     <input type="hidden" id="id_task1" name="task" value="{{ object.id }}">
 <p><label for="id_body">Текст:</label><textarea cols="40" id="id_body" name="body" rows="5">
@@ -41,5 +43,5 @@
 
     <input type="submit" value="Save" />
 </form>
-
+-->
 {% endblock %}

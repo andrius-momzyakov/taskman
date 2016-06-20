@@ -118,10 +118,25 @@ class NewTask(View):
 
 
 class EditTaskForm(forms.ModelForm):
+    file = forms.FileField(label='Файл', required=False)
+    comment = forms.CharField(label='Комментарий', widget=forms.Textarea, required=False)
+
     class Meta:
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
                   'closed', 'close_reason', 'parent']
+
+    def save(self, commit=True, user=None):
+        if self.cleaned_data['file']:
+            att = Attachment(task=Task.objects.get(pk=self.instance.id),
+                             file=self.cleaned_data['file'])
+            att.save()
+        if self.cleaned_data['comment']:
+            cmmt = Comment(task=Task.objects.get(pk=self.instance.id),
+                           body=self.cleaned_data['comment'])
+            cmmt.author = user
+            cmmt.save()
+        return super(EditTaskForm, self).save(commit=commit)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -147,9 +162,9 @@ class EditTask(View):
 
     def post(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
-        form = EditTaskForm(request.POST, instance=task)
+        form = EditTaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
-            task = form.save(commit=False)
+            task = form.save(commit=False, user=request.user)
             Task.check_status(task, request)
             task.save()
             return redirect(reverse('detail', args=[task.id, ]))
