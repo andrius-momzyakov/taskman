@@ -25,7 +25,7 @@ class Task(models.Model):
     DUPLICATE = 'DU'
     WONTFIX = 'WF'
     CLOSE_REASONS = (
-        (COMPLETE, 'Завершено'),
+        (COMPLETE, 'Решено'),
         (DUPLICATE, 'Дублирует существующую'),
         (WONTFIX, 'Отменено'),
     )
@@ -69,7 +69,10 @@ class Task(models.Model):
         return
 
     def get_status_literal(self):
-        return dict(Task.STATUSES)[self.status]
+        _close_reason = ''
+        if self.close_reason:
+            _close_reason = '-' + dict(Task.CLOSE_REASONS)[self.close_reason]
+        return dict(Task.STATUSES)[self.status] + _close_reason
 
 
 class TaskType(models.Model):
@@ -155,7 +158,10 @@ class TaskView(models.Model):
         ordering = ['-prty']
 
     def get_status_literal(self):
-        return dict(Task.STATUSES)[self.status]
+        _close_reason = ''
+        if self.close_reason:
+            _close_reason = '-' + dict(Task.CLOSE_REASONS)[self.close_reason]
+        return dict(Task.STATUSES)[self.status] + _close_reason
 
     def __str__(self):
         return self.subject
