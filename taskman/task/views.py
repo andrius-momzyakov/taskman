@@ -86,7 +86,7 @@ class TaskDetail(DetailView):
 class NewTaskForm(forms.ModelForm):
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status', 'parent', ]
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private', 'status', 'parent', ]
 
 
 @method_decorator(login_required, name='dispatch')
@@ -123,7 +123,7 @@ class EditTaskForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private', 'status',
                   'closed', 'close_reason', 'parent']
 
     def save(self, commit=True, user=None):

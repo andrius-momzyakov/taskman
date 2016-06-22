@@ -47,6 +47,7 @@ class Task(models.Model):
     type = models.ForeignKey('TaskType', verbose_name='Тип')
     project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
     module = models.ForeignKey('Module', verbose_name='Модуль', null=True, blank=True)
+    private = models.BooleanField(verbose_name='Частная', default=True)
 
     def __str__(self):
         return self.subject
@@ -73,6 +74,11 @@ class Task(models.Model):
         if self.close_reason:
             _close_reason = '-' + dict(Task.CLOSE_REASONS)[self.close_reason]
         return dict(Task.STATUSES)[self.status] + _close_reason
+
+    def get_private_literal(self):
+        if self.private:
+            return 'Да'
+        return 'Нет'
 
 
 class TaskType(models.Model):

@@ -10,6 +10,7 @@
 <p><b>Заявитель:</b>{{ object.created_by|default_if_none:"" }}</p>
 <p><b>Исполнитель:</b>{{ object.executor|default_if_none:"" }}</p>
 <p><b>Крайний срок:</b>{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</p>
+<p><b>Частная:</b>{{ object.get_private_literal}}</p>
 <p><b>Проект:</b>{{ object.project|default_if_none:"" }}</p>
 <p><b>Модуль:</b>{{ object.module|default_if_none:"" }}</p>
 <p><b>Статус:</b>{{ object.get_status_literal|default_if_none:"" }}</p>
