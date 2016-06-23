@@ -51,6 +51,10 @@ class TaskList(ListView):
             qs = TaskView.objects.filter(Q(status=Task.CLOSED))
         else:
             qs = TaskView.objects.all()
+        if self.request.user.is_authenticated():
+            qs = qs.filter(Q(private=False)|Q(private=True, created_by=self.request.user))
+        else:
+            qs = qs.filter(Q(private=False))
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(qs, self.paginate_by)
         if get_qry:
             context['get_qry'] = '?' + get_qry
@@ -81,6 +85,13 @@ class TaskDetail(DetailView):
         context['comments'] = comments
         context['children'] = children
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        task = self.get_object()
+        if task.private and task.created_by != request.user:
+            return HttpResponse('У вас нет прав на просмотр данной задачи. <a href="{}">Назад</a>'
+                                .format(request.META.get('HTTP_REFERER') + request.META.get('QUERY_STRING')))
+        return super(TaskDetail, self).dispatch(request, *args, **kwargs)
 
 
 class NewTaskForm(forms.ModelForm):
@@ -139,6 +150,13 @@ class EditTaskForm(forms.ModelForm):
         return super(EditTaskForm, self).save(commit=commit)
 
 
+class EditTaskFormGuest(EditTaskForm):
+    class Meta:
+        model = Task
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
+                  'closed', 'close_reason', 'parent']
+
+
 @method_decorator(login_required, name='dispatch')
 class EditTask(View):
     template = 'task_update_form.html'
@@ -153,7 +171,11 @@ class EditTask(View):
 
     def get(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
-        form = EditTaskForm(instance=task)
+        if task.created_by != request.user:
+            # без поля private
+            form = EditTaskFormGuest(instance=task)
+        else:
+            form = EditTaskForm(instance=task)
         context = {'form': form}
         self.add_context(task, context)
         return render_to_response(template_name=self.template, context=context,
@@ -162,7 +184,11 @@ class EditTask(View):
 
     def post(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
-        form = EditTaskForm(request.POST, request.FILES, instance=task)
+        if task.created_by != request.user:
+            # без поля private
+            form = EditTaskForm(request.POST, request.FILES, instance=task)
+        else:
+            form = EditTaskForm(request.POST, request.FILES, instance=task)
         if form.is_valid():
             task = form.save(commit=False, user=request.user)
             Task.check_status(task, request)
@@ -173,6 +199,13 @@ class EditTask(View):
         return render_to_response(template_name=self.template, context=context,
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
+
+    def dispatch(self, request, task_id, *args, **kwargs):
+        task = get_object_or_404(Task, pk=task_id)
+        if task.private and task.created_by != request.user:
+            return HttpResponse('У вас нет прав на редактирование данной задачи. <a href="{}">Назад</a>'
+                                .format(request.META.get('HTTP_REFERER') + request.META.get('QUERY_STRING')))
+        return super(EditTask, self).dispatch(request, task_id, *args, **kwargs)
 
 
 class NewAttachmentForm(forms.Form):

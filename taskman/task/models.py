@@ -157,6 +157,7 @@ class TaskView(models.Model):
     module = models.ForeignKey('Module', verbose_name='Модуль', on_delete=models.DO_NOTHING,
                                null=True, blank=True)
     prty = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
+    private = models.BooleanField(verbose_name='Частная', default=True)
 
     class Meta:
         managed = False

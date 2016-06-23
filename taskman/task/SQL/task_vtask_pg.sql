@@ -16,7 +16,8 @@ CREATE OR REPLACE VIEW task_vtask_null AS
     t.module_id,
     t.project_id,
     t.status,
-    tup.prty
+    tup.prty,
+    t.private
    FROM task_task t
      LEFT JOIN ( SELECT t_1.prty,
             t_1.user_id,
@@ -48,7 +49,8 @@ CREATE OR REPLACE VIEW task_vtask AS
     t.module_id,
     t.project_id,
     t.status,
-    COALESCE(t.prty, (-1)) AS prty
+    COALESCE(t.prty, (-1)) AS prty,
+    t.private
    FROM task_vtask_null t;
 
 ALTER TABLE task_vtask
