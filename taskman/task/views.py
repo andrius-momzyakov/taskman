@@ -33,13 +33,29 @@ class TaskList(ListView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             return redirect(reverse('anonymous_home', args=[1, ]) + request.GET.urlencode())
-        #return HttpResponse(request.GET.urlencode())
+        if request.GET.get('gotolast'):
+            if request.GET.get('gotolast').upper()=='YES':
+                status_qry_val = self.request.GET.get('status_in')
+                qs = self.get_filtered_qs(status_qry_val=status_qry_val)
+                pag, page_obj, object_list, is_pag = self.paginate_queryset(qs, self.paginate_by)
+                last_page = pag.num_pages
+                qry = ''
+                if status_qry_val:
+                    qry = '?status_in={}'.format(status_qry_val)
+                return redirect(reverse('home', args=[last_page, ]) + qry)
         return super(TaskList, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(TaskList, self).get_context_data(**kwargs)
         get_qry = self.request.GET.urlencode()
         status_qry_val = self.request.GET.get('status_in')
+        qs = self.get_filtered_qs(status_qry_val=status_qry_val)
+        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(qs, self.paginate_by)
+        if get_qry:
+            context['get_qry'] = '?' + get_qry
+        return context
+
+    def get_filtered_qs(self, status_qry_val=None):
         qs = None
         if status_qry_val == 'open':
             qs = TaskView.objects.filter(~Q(status=Task.CLOSED))
@@ -52,13 +68,10 @@ class TaskList(ListView):
         else:
             qs = TaskView.objects.all()
         if self.request.user.is_authenticated():
-            qs = qs.filter(Q(private=False)|Q(private=True, created_by=self.request.user))
+            qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
         else:
             qs = qs.filter(Q(private=False))
-        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(qs, self.paginate_by)
-        if get_qry:
-            context['get_qry'] = '?' + get_qry
-        return context
+        return qs
 
 
 class AnonymousTaskList(TaskList):
@@ -84,6 +97,10 @@ class TaskDetail(DetailView):
         context['attachments'] = attachments
         context['comments'] = comments
         context['children'] = children
+        if self.request.GET.get('gotolast'):
+            if self.request.GET.get('gotolast').upper() == 'YES':
+                context['gotolast4open'] = '&gotolast=yes'
+                context['gotolast4all'] = '?gotolast=yes'
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -122,7 +139,8 @@ class NewTask(View):
             task.created_by = request.user
             Task.check_status(task, request)
             task.save()
-            return redirect(reverse('detail', args=[task.id, ]))
+            update_task_priority(request, task_id=task.id, increase='down')
+            return redirect(reverse('detail', args=[task.id, ]) + '?gotolast=yes')
         return render_to_response(template_name=self.template, context={'form': form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
@@ -268,6 +286,11 @@ def serve_file(request, name):
 
 
 @login_required
+def update_task_priority_view(request, task_id=None, increase=None):
+    update_task_priority(request, task_id=task_id, increase=increase)
+    return redirect(reverse('home', args=[1, ]) + '?' + request.GET.urlencode())
+
+
 def update_task_priority(request, task_id=None, increase=None):
     t = get_object_or_404(Task, pk=task_id)
     u = request.user
@@ -279,4 +302,3 @@ def update_task_priority(request, task_id=None, increase=None):
     else:
         new_priority.priority = F('id')
     new_priority.save()
-    return redirect(reverse('home', args=[1, ]) + '?' + request.GET.urlencode())

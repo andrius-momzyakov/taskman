@@ -11,8 +11,8 @@
     <tr>
         {% if user.is_authenticated %}
             <td><a href="{% url 'new' %}">Новая задача</a></td>
-            <td><a href="{% url 'home' '1' %}?status_in=open">Текущие</a></td>
-            <td><a href="{% url 'home' '1' %}">Все</a></td>
+            <td><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></td>
+            <td><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></td>
             <td>
             <A href="/accounts/logout/?next=/">Выйти</A>
                 </td>

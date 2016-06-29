@@ -28,8 +28,8 @@ urlpatterns = [
     url(r'^attachment/$', v.NewAttachment.as_view(), name='attachment'),
     url(r'^page(?P<page>[0-9]+)/', v.TaskList.as_view(), name='home'),
     url(r'^anonymous/page(?P<page>[0-9]+)/', v.AnonymousTaskList.as_view(), name='anonymous_home'),
-    url(r'setpriority/(?P<task_id>\d+)/$', v.update_task_priority, name='priority'),
-    url(r'setpriority/(?P<task_id>\d+)/(?P<increase>down)/$', v.update_task_priority,
+    url(r'setpriority/(?P<task_id>\d+)/$', v.update_task_priority_view, name='priority'),
+    url(r'setpriority/(?P<task_id>\d+)/(?P<increase>down)/$', v.update_task_priority_view,
         name='priority_down'),
     #url(r'^$', v.TaskList.as_view(), name='home')
     url(r'^$', v.root, name='root')
