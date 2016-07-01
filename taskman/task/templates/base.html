@@ -3,32 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Система учета задач{% endblock %}</title>
+    <style>
+        li.menu_item { display:inline; }
+        li.menu_item a { background-color: rgb(80,80,80);
+                        color: white;
+                        padding: 10px 20px;
+                        text-decoration: none;
+                        border-radius: 4px 4px 0 0; }
+        li.menu_item a:hover { font-weight: bold;
+                               color: pink;}
+    </style>
 </head>
 <body>
 <div class="TopMenu">
 {% block menu %}
 <table>
-    <tr>
+    <ul>
         {% if user.is_authenticated %}
-            <td><a href="{% url 'new' %}">Новая задача</a></td>
-            <td><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></td>
-            <td><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></td>
-            <td>
+            <li class="menu_item"><a href="{% url 'new' %}">Новая задача</a></li>
+            <li class="menu_item"><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></li>
+            <li class="menu_item"><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></li>
+            <li class="menu_item">
             <A href="/accounts/logout/?next=/">Выйти</A>
-                </td>
-            <td>
+                </li>
+            <li class="menu_item">
                 <A href="/accounts/password_change/?next=/">Сменить
                 пароль</A>
-            </td>
+            </li>
         {% else %}
-            <td><a href="{% url 'anonymous_home' '1' %}?status_in=open">Текущие</a></td>
-            <td><a href="{% url 'anonymous_home' '1' %}">Все</a></td>
-            <td>    <A href="/accounts/login/?next=/">Войти</A></td>
+            <li class="menu_item"><a href="{% url 'anonymous_home' '1' %}?status_in=open">Текущие</a></li>
+            <li class="menu_item"><a href="{% url 'anonymous_home' '1' %}">Все</a></li>
+            <li class="menu_item">    <A href="/accounts/login/?next=/">Войти</A></li>
         {% endif %}
         {% if user.is_superuser %}
-            <td><a href="/admin/">Администрирование</ah></td>
+            <li class="menu_item"><a href="/admin/">Администрирование</a></li>
         {% endif %}
-    </tr>
+    </ul>
 </table>
 {% endblock %}
 </div>
