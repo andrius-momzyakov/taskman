@@ -4,17 +4,56 @@
     <meta charset="UTF-8">
     <title>{% block title %}Система учета задач{% endblock %}</title>
     <style>
-        li.menu_item { display:inline; }
+        li.menu_item { display:inline;
+                        #float:left;
+                        }
         li.menu_item a { background-color: rgb(80,80,80);
                         color: white;
                         padding: 10px 20px;
                         text-decoration: none;
-                        border-radius: 4px 4px 0 0; }
+                        border-radius: 0 0 4px 4px; }
         li.menu_item a:hover { font-weight: bold;
-                               color: pink;}
+                               color: pink;
+                               background-color: rgb(60,60,60);}
+        header {background-color: rgb(80,80,80);
+                        color: white;
+                        padding: 10px 20px;
+                        text-decoration: none;
+                        border-radius: 4px 4px 0 0;
+                        font-size: 150%;
+                        min-height:30px;}
+        footer {background-color: rgb(150,150,150);
+                    color: white;
+                    padding: 10px 20px;
+                    text-decoration: none;
+                    border-radius: 0 0 4px 4px;
+                    font-size:70%;
+                    min-height:20px;}
+        div.header{position:relative;
+                        width:70%;
+                        text-align:center;
+                        float:left;
+                        #padding:inherit;
+                        #min-height:inherit;
+                        }
+        div.header_info {position:relative;
+                                float:right;
+                                width:20%;
+                                font-size:14px;
+                                padding:inherit;
+                                #min-height:inherit;
+                                }
+        p.footer {display:inline;
+                  padding: 0 20px;}
     </style>
 </head>
 <body>
+<header><div class="header" >Система учета личных задач "Ежедневник"</div>
+    <div class="header_info">
+        {% if user.is_authenticated %}
+           Вы вошли как: {{ user }}
+        {% endif %}
+    </div></header>
 <div class="TopMenu">
 {% block menu %}
 <table>
@@ -43,6 +82,11 @@
 {% endblock %}
 </div>
 {% block content %}{% endblock %}
+<p></p>
+<footer>
+    <p class="footer">&copy; Момзяков Андрей Юрьевич, 2016</p><p class="footer">
+    <a href="mailto:andrius-smth@yandex.ru">Написать</a></p>
 
+</footer>
 </body>
 </html>

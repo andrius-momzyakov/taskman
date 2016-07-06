@@ -25,9 +25,9 @@
             <tr>
             {% if user.is_authenticated %}
                 <td>
-                    <button type="button" style="border-radius:30%;height:125%;" title="На верх списка"
+                    <button type="button" style="border-radius:30%;height:30px;width:30px;" title="На верх списка"
                             onclick="parent.location='{% url 'priority' task.id %}{{ get_qry }}'">&#9650;</button>
-                    <button type="button" style="border-radius:30%;height:125%;" title="В низ списка"
+                    <button type="button" style="border-radius:30%;height:30px;width:30px;" title="В низ списка"
                             onclick="parent.location='{% url 'priority_down' task_id=task.id increase='down' %}{{ get_qry }}'">&#9660;</button>
                 </td>
             {% endif %}
