@@ -3,21 +3,26 @@
 {% block title %}Описание задачи{% endblock %}
 {% block content %}
 <h1>{{ object.subject }}</h1>
-<a href="{% url 'edit' object.id %}">Изменить</a>
-<p><b>Тип:</b>{{ object.type }}</p>
-<p><b>Описание:</b><code><pre>{{ object.desc }}</pre></code></p>
-<p><b>Создано:</b>{{ object.created|date:'d.m.Y H:i'|default_if_none:"" }}</p>
-<p><b>Заявитель:</b>{{ object.created_by|default_if_none:"" }}</p>
-<p><b>Исполнитель:</b>{{ object.executor|default_if_none:"" }}</p>
-<p><b>Крайний срок:</b>{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</p>
-<p><b>Частная:</b>{{ object.get_private_literal}}</p>
-<p><b>Проект:</b>{{ object.project|default_if_none:"" }}</p>
-<p><b>Модуль:</b>{{ object.module|default_if_none:"" }}</p>
-<p><b>Статус:</b>{{ object.get_status_literal|default_if_none:"" }}</p>
-<p><b>Закрыто:</b>{{ object.closed|date:"d.m.Y H:i"|default_if_none:"" }}</p>
+<button onclick="parent.location='{% url 'edit' object.id %}'">Изменить</button>
+<!--<a href="{% url 'edit' object.id %}">Изменить</a> -->
+<hr>
+<table class="detail">
+    
+<tr><td><div><b>Тип:</b></div></td><td><div>{{ object.type }}</div></div></td></tr>
+<tr><td><div><b>Описание:</b></div></td><td><div><code><pre>{{ object.desc }}</pre></code></div></td></tr>
+<tr><td><div><b>Создано:</b></div></td><td><div>{{ object.created|date:'d.m.Y H:i'|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Заявитель:</b></div></td><td><div>{{ object.created_by|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Исполнитель:</b></div></td><td><div>{{ object.executor|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Крайний срок:</b></div></td><td><div>{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Частная:</b></div></td><td><div>{{ object.get_private_literal}}</div></td></tr>
+<tr><td><div><b>Проект:</b></div></td><td><div>{{ object.project|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Модуль:</b></div></td><td><div>{{ object.module|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Статус:</b></div></td><td><div>{{ object.get_status_literal|default_if_none:"" }}</div></td></tr>
+<tr><td><div><b>Закрыто:</b></div></td><td><div>{{ object.closed|date:"d.m.Y H:i"|default_if_none:"" }}</div></td></tr>
 {% if object.parent %}
-<p><b>Родительская задача:</b><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></p>
+<tr><td><div><b>Родительская задача:</b></div></td><td><div><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></div></td></tr>
 {% endif %}
+    </table>
 
 {% if children %}
 <h2>Подзадачи</h2>
@@ -38,7 +43,7 @@
 <table>
 {% for comment in comments%}
 
-    <tr>
+    <tr class="detail">
         <td>{{ comment.author }}</td>
         <td>{{ comment.created|date:"d.m.Y" }}</td>
         <td><pre>{{ comment.body }}</pre></td>
