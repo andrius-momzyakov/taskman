@@ -3,7 +3,10 @@
 {% block title %}Список задач{% endblock %}
 {% block content %}
 <form enctype="multipart/form-data" action="" method="post">{% csrf_token %}
-    {{ form.as_p }}
+    {{ form.non_field_errors }}
+    <table>
+    {{ form.as_table }}
+        </table>
     <input type="submit" value="Сохранить" />
 </form>
 
