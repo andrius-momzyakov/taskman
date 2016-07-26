@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <title>{% block title %}Система учета задач{% endblock %}</title>
 
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="{% static 'jquery-1.11.1.min.js'%}"></script>
+		<script type="text/javascript" src="{% static jquery-ui.min.js'%}"></script>
 		<script type="text/javascript" src="{% static 'jquery-ui-timepicker-addon.js' %}"></script>
         <script>
             $.datepicker.regional['ru'] = {
@@ -54,7 +54,7 @@
           } );
         </script>
 
-    <link rel="stylesheet" media="all" type="text/css" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" media="all" type="text/css" href="{% static 'jquery-ui.css'%}" />
     <link rel="stylesheet" media="all" type="text/css" href="{% static 'jquery-ui-timepicker-addon.css'%}" />
     <style>
         li.menu_item { display:inline;
