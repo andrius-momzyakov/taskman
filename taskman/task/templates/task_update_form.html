@@ -31,8 +31,7 @@
         <tr>
             <td>{{ comment.author }}</td>
             <td>{{ comment.created }}</td>
-        </tr>
-        <tr>        <td>{{ comment.body }}</td>
+            <td><pre>{{ comment.body }}</pre></td>
         </tr>
         {% endfor %}
 </table>

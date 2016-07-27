@@ -164,15 +164,54 @@ class EditTaskForm(forms.ModelForm):
         }
 
     def save(self, commit=True, user=None):
+
+        def save_comment(task_instance, body, author=user):
+            cmmt = Comment(task=task_instance, #Task.objects.get(pk=task_id),
+                           body=body, author=user)
+            cmmt.save()
+
+        try:
+            comment_message = 'Пользователь {} внес правки:\n'.format(user)
+            changes_done = False
+            saved_task = Task.objects.get(pk=self.instance.id)
+            for attribute in ['type', 'subject', 'desc', 'executor', 'private', 'status', 'close_reason',
+                              'deadline_date', 'project', 'parent', 'closed']:
+                if getattr(saved_task, attribute) != self.cleaned_data[attribute]:
+                    val1 = ''
+                    val2 = ''
+                    if attribute == 'status':
+                        val1 = dict(Task.STATUSES).get(getattr(saved_task, attribute), '-')
+                        val2 = dict(Task.STATUSES).get(self.cleaned_data[attribute], '-')
+                    elif attribute == 'close_reason':
+                        val1 = dict(Task.CLOSE_REASONS).get(getattr(saved_task, attribute), '-')
+                        val2 = dict(Task.CLOSE_REASONS).get(self.cleaned_data[attribute], '-')
+                    else:
+                        val1 = getattr(saved_task, attribute)
+                        val2 = self.cleaned_data[attribute]
+                        if val1 is None:
+                            val1 = ''
+                        if val2 is None:
+                            val2 = ''
+                    comment_message += '{} изменен(а) с "{}" на "{}"\n'\
+                                       .format(self.instance._meta.get_field_by_name(attribute)[0].verbose_name,
+                                               val1,
+                                               val2)
+                    changes_done = True
+            if changes_done:
+                save_comment(task_instance=self.instance,
+                             body=comment_message, author=user)
+        except Task.DoesNotExist:
+            pass
         if self.cleaned_data['file']:
             att = Attachment(task=Task.objects.get(pk=self.instance.id),
                              file=self.cleaned_data['file'])
             att.save()
+            save_comment(task_instance=self.instance,
+                         body='Пользователь {} добавил вложение {}'.format(user, self.cleaned_data['file']),
+                         author=user)
         if self.cleaned_data['comment']:
-            cmmt = Comment(task=Task.objects.get(pk=self.instance.id),
-                           body=self.cleaned_data['comment'])
-            cmmt.author = user
-            cmmt.save()
+            save_comment(task_instance=self.instance,
+                         body=self.cleaned_data['comment'], author=user )
         return super(EditTaskForm, self).save(commit=commit)
 
 

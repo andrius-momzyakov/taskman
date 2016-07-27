@@ -42,7 +42,7 @@ class Task(models.Model):
     closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
     close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True, blank=True,
                                     choices=CLOSE_REASONS)
-    parent = models.ForeignKey('self', null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, verbose_name='Родительская задача')
     executor = models.ForeignKey(User, related_name='executor', null=True, blank=True)
     type = models.ForeignKey('TaskType', verbose_name='Тип')
     project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
