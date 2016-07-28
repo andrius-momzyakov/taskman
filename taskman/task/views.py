@@ -17,6 +17,7 @@ from django.core.urlresolvers import reverse
 import django.db as db
 from django.db.models import Q
 from django.db.models.expressions import F
+from django.utils.translation import ugettext as _
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from django.conf import settings
@@ -151,8 +152,8 @@ class NewTask(View):
 
 
 class EditTaskForm(forms.ModelForm):
-    file = forms.FileField(label='Файл', required=False)
-    comment = forms.CharField(label='Комментарий', widget=forms.Textarea, required=False)
+    file = forms.FileField(label=_('Файл'), required=False)
+    comment = forms.CharField(label=_('Комментарий'), widget=forms.Textarea, required=False)
 
     class Meta:
         model = Task
@@ -171,7 +172,7 @@ class EditTaskForm(forms.ModelForm):
             cmmt.save()
 
         try:
-            comment_message = 'Пользователь {} внес правки:\n'.format(user)
+            comment_message = _('Пользователь {} внес правки:\n').format(user)
             changes_done = False
             saved_task = Task.objects.get(pk=self.instance.id)
             for attribute in ['type', 'subject', 'desc', 'executor', 'private', 'status', 'close_reason',
@@ -192,7 +193,7 @@ class EditTaskForm(forms.ModelForm):
                             val1 = ''
                         if val2 is None:
                             val2 = ''
-                    comment_message += '{} изменен(а) с "{}" на "{}"\n'\
+                    comment_message += _('{} изменен(а) с "{}" на "{}"\n')\
                                        .format(self.instance._meta.get_field_by_name(attribute)[0].verbose_name,
                                                val1,
                                                val2)
@@ -207,7 +208,7 @@ class EditTaskForm(forms.ModelForm):
                              file=self.cleaned_data['file'])
             att.save()
             save_comment(task_instance=self.instance,
-                         body='Пользователь {} добавил вложение {}'.format(user, self.cleaned_data['file']),
+                         body=_('Пользователь {} добавил вложение {}').format(user, self.cleaned_data['file']),
                          author=user)
         if self.cleaned_data['comment']:
             save_comment(task_instance=self.instance,
@@ -268,7 +269,7 @@ class EditTask(View):
     def dispatch(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
         if task.private and task.created_by != request.user:
-            return HttpResponse('У вас нет прав на редактирование данной задачи. <a href="{}">Назад</a>'
+            return HttpResponse(_('У вас нет прав на редактирование данной задачи. <a href="{}">Назад</a>')
                                 .format(request.META.get('HTTP_REFERER') + request.META.get('QUERY_STRING')))
         return super(EditTask, self).dispatch(request, task_id, *args, **kwargs)
 
@@ -287,7 +288,7 @@ class NewAttachment(View):
                              , file=request.FILES['file'])
             att.save()
             return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
-        return HttpResponse('Неправильно введены данные.')
+        return HttpResponse(_('Неправильно введены данные.'))
 
 
 class NewCommentForm(forms.Form):
@@ -307,7 +308,7 @@ class NewComment(View):
             comment.task = Task.objects.get(pk=int(form.cleaned_data['task']))
             comment.save()
             return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
-        return HttpResponse('Неправильно введены данные.')
+        return HttpResponse(_('Неправильно введены данные.'))
 
 
 #@login_required
@@ -323,7 +324,7 @@ def serve_file(request, name):
     f = None
     f = open(settings.MEDIA_ROOT + name, 'rb')
     if not f:
-        return HttpResponse('Файл не найден или не существует.')
+        return HttpResponse(_('Файл не найден или не существует.'))
     data = File(f)
     response = HttpResponse(data, content_type=ctype)
     # todo: Сделать на Streaming response

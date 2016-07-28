@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 
 
@@ -15,9 +16,9 @@ class Task(models.Model):
     CLOSED = 'CLOSED'
 
     STATUSES = (
-        (NEW, 'Новая'),
-        (ACCEPTED, 'В работе'),
-        (CLOSED, 'Закрыта'),
+        (NEW, _('Новая')),
+        (ACCEPTED, _('В работе')),
+        (CLOSED, _('Закрыта')),
     )
 
     # Тип закрытия
@@ -25,29 +26,29 @@ class Task(models.Model):
     DUPLICATE = 'DU'
     WONTFIX = 'WF'
     CLOSE_REASONS = (
-        (COMPLETE, 'Решено'),
-        (DUPLICATE, 'Дублирует существующую'),
-        (WONTFIX, 'Отменено'),
+        (COMPLETE, _('Решено')),
+        (DUPLICATE, _('Дублирует существующую')),
+        (WONTFIX, _('Отменено')),
     )
 
-    subject = models.CharField(max_length=255, verbose_name='Задача')
-    desc = models.TextField(verbose_name='Описание', null=True, blank=True)
-    deadline_date = models.DateTimeField(verbose_name='Крайний срок', null=True, blank=True)
-    notify_before = models.IntegerField(verbose_name='Уведомить за (дней)', null=True, blank=True)
-    created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True, default=datetime.now)
-    created_by = models.ForeignKey(User, related_name='creator', verbose_name='Создал', null=True, blank=True)
-    updated = models.DateTimeField(verbose_name='Когда изменена', null=True, blank=True, default=datetime.now)
-    updated_by = models.ForeignKey(User, related_name='updater', verbose_name='Изменил', null=True, blank=True)
-    status = models.CharField(verbose_name='Статус', max_length=30, choices=STATUSES)
-    closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
-    close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True, blank=True,
+    subject = models.CharField(max_length=255, verbose_name=_('Задача'))
+    desc = models.TextField(verbose_name=_('Описание'), null=True, blank=True)
+    deadline_date = models.DateTimeField(verbose_name=_('Крайний срок'), null=True, blank=True)
+    notify_before = models.IntegerField(verbose_name=_('Уведомить за (дней)'), null=True, blank=True)
+    created = models.DateTimeField(verbose_name=_('Когда создана'), null=True, blank=True, default=datetime.now)
+    created_by = models.ForeignKey(User, related_name='creator', verbose_name=_('Создал'), null=True, blank=True)
+    updated = models.DateTimeField(verbose_name=_('Когда изменена'), null=True, blank=True, default=datetime.now)
+    updated_by = models.ForeignKey(User, related_name='updater', verbose_name=_('Изменил'), null=True, blank=True)
+    status = models.CharField(verbose_name=_('Статус'), max_length=30, choices=STATUSES)
+    closed = models.DateTimeField(verbose_name=_('Когда закрыта'), null=True, blank=True)
+    close_reason = models.CharField(max_length=2, verbose_name=_('Тип закрытия'), null=True, blank=True,
                                     choices=CLOSE_REASONS)
-    parent = models.ForeignKey('self', null=True, blank=True, verbose_name='Родительская задача')
+    parent = models.ForeignKey('self', null=True, blank=True, verbose_name=_('Родительская задача'))
     executor = models.ForeignKey(User, related_name='executor', null=True, blank=True)
-    type = models.ForeignKey('TaskType', verbose_name='Тип')
-    project = models.ForeignKey('Project', verbose_name='Проект', null=True, blank=True)
-    module = models.ForeignKey('Module', verbose_name='Модуль', null=True, blank=True)
-    private = models.BooleanField(verbose_name='Частная', default=True)
+    type = models.ForeignKey('TaskType', verbose_name=_('Тип'))
+    project = models.ForeignKey('Project', verbose_name=_('Проект'), null=True, blank=True)
+    module = models.ForeignKey('Module', verbose_name=_('Модуль'), null=True, blank=True)
+    private = models.BooleanField(verbose_name=_('Частная'), default=True)
 
     def __str__(self):
         return self.subject
@@ -77,46 +78,46 @@ class Task(models.Model):
 
     def get_private_literal(self):
         if self.private:
-            return 'Да'
-        return 'Нет'
+            return _('Да')
+        return _('Нет')
 
 
 class TaskType(models.Model):
-    short_typename = models.CharField(max_length=30, verbose_name='Краткое наименование для ссылок (лат.)', unique=True,
+    short_typename = models.CharField(max_length=30, verbose_name=_('Краткое наименование для ссылок (лат.)'), unique=True,
                                       )
-    typename = models.CharField(max_length=100, verbose_name='Тип задачи')
+    typename = models.CharField(max_length=100, verbose_name=_('Тип задачи'))
 
     def __str__(self):
         return self.typename
 
 class Attachment(models.Model):
-    task = models.ForeignKey(Task, verbose_name='Задача')
-    file = models.FileField(verbose_name='Файл')
+    task = models.ForeignKey(Task, verbose_name=_('Задача'))
+    file = models.FileField(verbose_name=_('Файл'))
 
     def __str__(self):
         return self.file.name
 
 class Comment(models.Model):
-    task = models.ForeignKey(Task, verbose_name='Задача')
-    author = models.ForeignKey(User, verbose_name='Автор')
-    created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True, default=datetime.now)
-    body = models.TextField(verbose_name='Комментарий')
+    task = models.ForeignKey(Task, verbose_name=_('Задача'))
+    author = models.ForeignKey(User, verbose_name=_('Автор'))
+    created = models.DateTimeField(verbose_name=_('Когда создана'), null=True, blank=True, default=datetime.now)
+    body = models.TextField(verbose_name=_('Комментарий'))
     parent = models.ForeignKey('self', null=True, blank=True)
-    attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True)
+    attachments = models.ManyToManyField('Attachment', verbose_name=_('Файлы'), blank=True)
 
 class Project(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Наименование проекта', unique=True)
-    start_date = models.DateField(verbose_name='Дата начала', null=True, blank=True)
-    finish_date = models.DateField(verbose_name='Дата окончания', null=True, blank=True)
+    name = models.CharField(max_length=255, verbose_name=_('Наименование проекта'), unique=True)
+    start_date = models.DateField(verbose_name=_('Дата начала'), null=True, blank=True)
+    finish_date = models.DateField(verbose_name=_('Дата окончания'), null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
 class Module(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Наименование модуля', unique=True)
-    desc = models.TextField(verbose_name='Краткое описание', null=True, blank=True)
-    project = models.ForeignKey(Project, verbose_name='Проект', null=True, blank=True)
+    name = models.CharField(max_length=255, verbose_name=_('Наименование модуля'), unique=True)
+    desc = models.TextField(verbose_name=_('Краткое описание'), null=True, blank=True)
+    project = models.ForeignKey(Project, verbose_name=_('Проект'), null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -126,38 +127,38 @@ class TaskUserPriority(models.Model):
     '''
     Primary key's value is used as priority value
     '''
-    priority = models.IntegerField(verbose_name='Значение приоритета', null=True, blank=True)
-    task = models.ForeignKey(Task, verbose_name='Задача', )
-    user = models.ForeignKey(User, verbose_name='Пользователь')
+    priority = models.IntegerField(verbose_name=_('Значение приоритета'), null=True, blank=True)
+    task = models.ForeignKey(Task, verbose_name=_('Задача'), )
+    user = models.ForeignKey(User, verbose_name=_('Пользователь'))
 
 
 class TaskView(models.Model):
-    subject = models.CharField(max_length=255, verbose_name='Задача')
-    desc = models.TextField(verbose_name='Описание', null=True, blank=True)
-    deadline_date = models.DateTimeField(verbose_name='Крайний срок', null=True, blank=True)
-    notify_before = models.IntegerField(verbose_name='Уведомить за (дней)', null=True, blank=True)
-    created = models.DateTimeField(verbose_name='Когда создана', null=True, blank=True,
+    subject = models.CharField(max_length=255, verbose_name=_('Задача'))
+    desc = models.TextField(verbose_name=_('Описание'), null=True, blank=True)
+    deadline_date = models.DateTimeField(verbose_name=_('Крайний срок'), null=True, blank=True)
+    notify_before = models.IntegerField(verbose_name=_('Уведомить за (дней)'), null=True, blank=True)
+    created = models.DateTimeField(verbose_name=_('Когда создана'), null=True, blank=True,
                                    default=datetime.now)
     created_by = models.ForeignKey(User, related_name='vcreator', on_delete=models.DO_NOTHING,
-                                   verbose_name='Создал', null=True, blank=True)
-    updated = models.DateTimeField(verbose_name='Когда изменена', null=True, blank=True,
+                                   verbose_name=_('Создал'), null=True, blank=True)
+    updated = models.DateTimeField(verbose_name=_('Когда изменена'), null=True, blank=True,
                                    default=datetime.now)
     updated_by = models.ForeignKey(User, related_name='vupdater', on_delete=models.DO_NOTHING,
-                                   verbose_name='Изменил', null=True, blank=True)
-    status = models.CharField(verbose_name='Статус', max_length=30, choices=Task.STATUSES)
-    closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
-    close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True,
+                                   verbose_name=_('Изменил'), null=True, blank=True)
+    status = models.CharField(verbose_name=_('Статус'), max_length=30, choices=Task.STATUSES)
+    closed = models.DateTimeField(verbose_name=_('Когда закрыта'), null=True, blank=True)
+    close_reason = models.CharField(max_length=2, verbose_name=_('Тип закрытия'), null=True,
                                     blank=True, choices=Task.CLOSE_REASONS)
     parent = models.ForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True)
     executor = models.ForeignKey(User, related_name='vexecutor', on_delete=models.DO_NOTHING,
                                  null=True, blank=True)
-    type = models.ForeignKey('TaskType', verbose_name='Тип', on_delete=models.DO_NOTHING)
-    project = models.ForeignKey('Project', verbose_name='Проект', on_delete=models.DO_NOTHING,
+    type = models.ForeignKey('TaskType', verbose_name=_('Тип'), on_delete=models.DO_NOTHING)
+    project = models.ForeignKey('Project', verbose_name=_('Проект'), on_delete=models.DO_NOTHING,
                                 null=True, blank=True)
-    module = models.ForeignKey('Module', verbose_name='Модуль', on_delete=models.DO_NOTHING,
+    module = models.ForeignKey('Module', verbose_name=_('Модуль'), on_delete=models.DO_NOTHING,
                                null=True, blank=True)
-    prty = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
-    private = models.BooleanField(verbose_name='Частная', default=True)
+    prty = models.IntegerField(verbose_name=_('Приоритет (не задавать вручную!)'), default=0)
+    private = models.BooleanField(verbose_name=_('Частная'), default=True)
 
     class Meta:
         managed = False
