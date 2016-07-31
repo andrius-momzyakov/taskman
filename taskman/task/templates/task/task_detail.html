@@ -1,6 +1,7 @@
+{% load i18n %}
 {% extends "base.html" %}
 
-{% block title %}Описание задачи{% endblock %}
+{% block title %}{% trans 'Описание задачи' %}{% endblock %}
 {% block content %}
 <h1>{{ object.subject }}</h1>
 <button onclick="parent.location='{% url 'edit' object.id %}'">Изменить</button>
