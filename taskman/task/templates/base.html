@@ -4,12 +4,16 @@
 <head>
     {% load staticfiles%}
     <meta charset="UTF-8">
-    <title>{% block title %}Система учета задач{% endblock %}</title>
+    <title>{% block title %}{% trans 'Система учета задач' %}{% endblock %}</title>
 
 		<script type="text/javascript" src="{% static 'jquery-1.11.1.min.js'%}"></script>
 		<script type="text/javascript" src="{% static 'jquery-ui.min.js'%}"></script>
 		<script type="text/javascript" src="{% static 'jquery-ui-timepicker-addon.js' %}"></script>
         <script>
+        if (navigator.language || navigator.userLanguage != 'ru'){
+            $.datepicker.setDefaults();
+            $.timepicker.setDefaults();
+        }else{
             $.datepicker.regional['ru'] = {
             closeText: 'Закрыть',
             prevText: '<Пред',
@@ -48,11 +52,11 @@
             isRTL: false
         };
         $.timepicker.setDefaults($.timepicker.regional['ru']);
-
+        }
           $( function() {
-            // $( "#id_deadline_date" ).datetimepicker();
             $( ".dt-picker" ).datetimepicker();
           } );
+
         </script>
 
     <link rel="stylesheet" media="all" type="text/css" href="{% static 'jquery-ui.css'%}" />
@@ -108,10 +112,10 @@
     </style>
 </head>
 <body>
-<header><div class="header" >Система учета личных задач "Ежедневник"</div>
+<header><div class="header" >{% trans 'Система учета личных задач "Ежедневник"' %}</div>
     <div class="header_info">
         {% if user.is_authenticated %}
-           Вы вошли как: {{ user }}
+           {% trans Вы вошли как: %}{{ user }}
         {% endif %}
     </div></header>
 <div class="TopMenu">
