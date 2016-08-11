@@ -1,6 +1,6 @@
 import mimetypes
 import urllib
-
+import os
 from datetime import datetime
 
 from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext, \
@@ -288,6 +288,28 @@ class NewAttachment(View):
             att.save()
             return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
         return HttpResponse('Неправильно введены данные.')
+
+
+def delete_task_attachment(request, a_id):
+    '''
+    deletes task attachment
+    :param request:
+    :param a_id:
+    :return:
+    '''
+    obj_id = int(a_id)
+    obj = Attachment.objects.get(pk=obj_id)
+    ospath = settings.MEDIA_ROOT
+    try:
+        os.remove(ospath + obj.file.name)
+    except OSError:
+        try:
+            os.remove(ospath + obj.file.name[1:])
+        except FileNotFoundError:
+            pass
+    task = obj.task
+    obj.delete()
+    return redirect(reverse('edit', args=[task.id,]))
 
 
 class NewCommentForm(forms.Form):

@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^file/(?P<name>.*)$', v.serve_file, name='file'),
     url(r'^comment/$', v.NewComment.as_view(), name='comment'),
     url(r'^attachment/$', v.NewAttachment.as_view(), name='attachment'),
+    url(r'^attachment/delete/(?P<a_id>[0-9]+)/$', v.delete_task_attachment, name='delete_attachment'),
     url(r'^page(?P<page>[0-9]+)/', v.TaskList.as_view(), name='home'),
     url(r'^anonymous/page(?P<page>[0-9]+)/', v.AnonymousTaskList.as_view(), name='anonymous_home'),
     url(r'setpriority/(?P<task_id>\d+)/$', v.update_task_priority_view, name='priority'),
