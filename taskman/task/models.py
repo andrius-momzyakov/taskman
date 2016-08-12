@@ -104,6 +104,9 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True)
     attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True)
 
+    def __str__(self):
+        return str(self.task) + ' ' + self.created.strftime('%Y.%m.%d %H:%M')
+
 class Project(models.Model):
     name = models.CharField(max_length=255, verbose_name='Наименование проекта', unique=True)
     start_date = models.DateField(verbose_name='Дата начала', null=True, blank=True)
