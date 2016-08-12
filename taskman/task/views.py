@@ -242,6 +242,7 @@ class EditTask(View):
         else:
             form = EditTaskForm(instance=task)
         context = {'form': form}
+        context.update({'STATIC_URL':settings.STATIC_URL})
         self.add_context(task, context)
         return render_to_response(template_name=self.template, context=context,
                                   context_instance=RequestContext(request, {}
@@ -294,7 +295,7 @@ def delete_task_attachment(request, a_id):
     '''
     deletes task attachment
     :param request:
-    :param a_id:
+    :param a_id: attachment id
     :return:
     '''
     obj_id = int(a_id)
