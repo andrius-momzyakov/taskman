@@ -133,7 +133,7 @@
             <li class="menu_item"><a href="{% url 'anonymous_home' '1' %}">Все</a></li>
             <li class="menu_item">    <A href="/accounts/login/?next=/">Войти</A></li>
         {% endif %}
-        {% if user.is_superuser %}
+        {% if user.is_superuser or user.is_staff %}
             <li class="menu_item"><a href="/admin/">Администрирование</a></li>
         {% endif %}
     </ul>
