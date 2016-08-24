@@ -19,7 +19,9 @@ from django.db.models import Q
 from django.db.models.expressions import F
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
+from .filters import TaskFilter
 from django.conf import settings
+
 
 
 # Create your views here.
@@ -50,7 +52,9 @@ class TaskList(ListView):
         get_qry = self.request.GET.urlencode()
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
-        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(qs, self.paginate_by)
+        filter = TaskFilter(self.request.GET, qs)
+        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter, self.paginate_by)
+        context['filter_form'] = filter.form
         if get_qry:
             context['get_qry'] = '?' + get_qry
         return context
