@@ -115,7 +115,7 @@
 <header><div class="header" >{% trans 'Система учета личных задач "Ежедневник"' %}</div>
     <div class="header_info">
         {% if user.is_authenticated %}
-           {% trans Вы вошли как: %}{{ user }}
+           {% trans "Вы вошли как:" %}&nbsp{{ user }}
         {% endif %}
     </div></header>
 <div class="TopMenu">
@@ -123,11 +123,12 @@
 <table>
     <ul>
         {% if user.is_authenticated %}
-            <li class="menu_item"><a href="{% url 'new' %}">Новая задача</a></li>
-            <li class="menu_item"><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></li>
-            <li class="menu_item"><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></li>
+            <li class="menu_item"><a href="{% url 'new' %}">{% trans "Новая задача" %}</a></li>
+            <li class="menu_item"><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}"
+                >{% trans "Текущие"%}</a></li>
+            <li class="menu_item"><a href="{% url 'home' '1' %}{{ gotolast4all }}">{% trans "Все" %}</a></li>
             <li class="menu_item">
-            <A href="/accounts/logout/?next=/">Выйти</A>
+            <A href="/accounts/logout/?next=/">{% trans "Выйти" %}</A>
                 </li>
             <li class="menu_item">
                 <A href="/accounts/password_change/?next=/">Сменить

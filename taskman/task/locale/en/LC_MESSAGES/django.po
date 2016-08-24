@@ -1,0 +1,368 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-08-06 16:26+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: task/models.py:19
+msgid "Новая"
+msgstr "New"
+
+#: task/models.py:20
+msgid "В работе"
+msgstr "In process"
+
+#: task/models.py:21
+msgid "Закрыта"
+msgstr "Closed"
+
+#: task/models.py:29
+msgid "Решено"
+msgstr "Solved"
+
+#: task/models.py:30
+msgid "Дублирует существующую"
+msgstr "Duplicate"
+
+#: task/models.py:31
+msgid "Отменено"
+msgstr "Cancelled"
+
+#: task/models.py:34 task/models.py:94 task/models.py:101 task/models.py:131
+#: task/models.py:136
+msgid "Задача"
+msgstr "Task"
+
+#: task/models.py:35 task/models.py:137
+msgid "Описание"
+msgstr "Description"
+
+#: task/models.py:36 task/models.py:138
+msgid "Крайний срок"
+msgstr "Deadline"
+
+#: task/models.py:37 task/models.py:139
+msgid "Уведомить за (дней)"
+msgstr "Notify before (days)"
+
+#: task/models.py:38 task/models.py:103 task/models.py:140
+msgid "Когда создана"
+msgstr "Creation time"
+
+#: task/models.py:39 task/models.py:143
+msgid "Создал"
+msgstr "Created by"
+
+#: task/models.py:40 task/models.py:144
+msgid "Когда изменена"
+msgstr "Change time"
+
+#: task/models.py:41 task/models.py:147
+msgid "Изменил"
+msgstr "Changed by"
+
+#: task/models.py:42 task/models.py:148
+msgid "Статус"
+msgstr "Status"
+
+#: task/models.py:43 task/models.py:149
+msgid "Когда закрыта"
+msgstr "Close time"
+
+#: task/models.py:44 task/models.py:150
+msgid "Тип закрытия"
+msgstr "Closing type"
+
+#: task/models.py:46
+msgid "Родительская задача"
+msgstr "Parent task"
+
+#: task/models.py:48 task/models.py:155
+msgid "Тип"
+msgstr "Type"
+
+#: task/models.py:49 task/models.py:120 task/models.py:156
+msgid "Проект"
+msgstr "Project"
+
+#: task/models.py:50 task/models.py:158
+msgid "Модуль"
+msgstr "Module"
+
+#: task/models.py:51 task/models.py:161
+msgid "Частная"
+msgstr "Private"
+
+#: task/models.py:81
+msgid "Да"
+msgstr "Yes"
+
+#: task/models.py:82
+msgid "Нет"
+msgstr "No"
+
+#: task/models.py:86
+msgid "Краткое наименование для ссылок (лат.)"
+msgstr "Shortname for reference"
+
+#: task/models.py:88
+msgid "Тип задачи"
+msgstr "Task type"
+
+#: task/models.py:95 task/views.py:155
+msgid "Файл"
+msgstr "File"
+
+#: task/models.py:102
+msgid "Автор"
+msgstr "Author"
+
+#: task/models.py:104 task/views.py:156
+msgid "Комментарий"
+msgstr "Comment"
+
+#: task/models.py:106
+msgid "Файлы"
+msgstr "Files"
+
+#: task/models.py:109
+msgid "Наименование проекта"
+msgstr "Project name"
+
+#: task/models.py:110
+msgid "Дата начала"
+msgstr "Start date"
+
+#: task/models.py:111
+msgid "Дата окончания"
+msgstr "End date"
+
+#: task/models.py:118
+msgid "Наименование модуля"
+msgstr "Module name"
+
+#: task/models.py:119
+msgid "Краткое описание"
+msgstr "Short description"
+
+#: task/models.py:130
+msgid "Значение приоритета"
+msgstr "Priority number"
+
+#: task/models.py:132
+msgid "Пользователь"
+msgstr "User"
+
+#: task/models.py:160
+msgid "Приоритет (не задавать вручную!)"
+msgstr "Priority (must be set programmatically!)"
+
+#: task/templates/base.html:7
+msgid "Система учета задач"
+msgstr "Task record system"
+
+#: task/templates/base.html:115
+msgid "Система учета личных задач \"Ежедневник\""
+msgstr "Personal task record system \"Diary\""
+
+#: task/templates/base.html:118
+msgid "Вы вошли как:"
+msgstr "You logged in as:"
+
+#: task/templates/registration/logged_out.html:4
+#: task/templates/registration/password_change_done.html:6
+#: task/templates/registration/password_change_form.html:7
+#: task/templates/registration/password_reset_complete.html:6
+#: task/templates/registration/password_reset_confirm.html:6
+#: task/templates/registration/password_reset_done.html:6
+#: task/templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr ""
+
+#: task/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr ""
+
+#: task/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr ""
+
+#: task/templates/registration/login.html:19
+#: task/templates/registration/password_change_form.html:21
+msgid "Please correct the error below."
+msgstr ""
+
+#: task/templates/registration/login.html:19
+#: task/templates/registration/password_change_form.html:21
+msgid "Please correct the errors below."
+msgstr ""
+
+#: task/templates/registration/login.html:45
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: task/templates/registration/login.html:49
+#: task/templates/registration/password_reset_complete.html:18
+msgid "Log in"
+msgstr ""
+
+#: task/templates/registration/password_change_done.html:3
+#: task/templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr ""
+
+#: task/templates/registration/password_change_done.html:3
+#: task/templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr ""
+
+#: task/templates/registration/password_change_done.html:3
+#: task/templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr ""
+
+#: task/templates/registration/password_change_done.html:7
+#: task/templates/registration/password_change_form.html:8
+msgid "Password change"
+msgstr ""
+
+#: task/templates/registration/password_change_done.html:14
+msgid "Your password was changed."
+msgstr ""
+
+#: task/templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+#: task/templates/registration/password_change_form.html:54
+#: task/templates/registration/password_reset_confirm.html:24
+msgid "Change my password"
+msgstr ""
+
+#: task/templates/registration/password_reset_complete.html:7
+#: task/templates/registration/password_reset_done.html:7
+#: task/templates/registration/password_reset_form.html:7
+msgid "Password reset"
+msgstr ""
+
+#: task/templates/registration/password_reset_complete.html:16
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+
+#: task/templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr ""
+
+#: task/templates/registration/password_reset_confirm.html:17
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: task/templates/registration/password_reset_confirm.html:21
+msgid "New password:"
+msgstr ""
+
+#: task/templates/registration/password_reset_confirm.html:23
+msgid "Confirm password:"
+msgstr ""
+
+#: task/templates/registration/password_reset_confirm.html:29
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+
+#: task/templates/registration/password_reset_done.html:15
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+
+#: task/templates/registration/password_reset_done.html:17
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#: task/templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: task/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: task/templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: task/templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: task/templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: task/templates/registration/password_reset_form.html:15
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+
+#: task/templates/registration/password_reset_form.html:19
+msgid "Email address:"
+msgstr ""
+
+#: task/templates/registration/password_reset_form.html:19
+msgid "Reset my password"
+msgstr ""
+
+#: task/templates/task/task_detail.html:4
+msgid "Описание задачи"
+msgstr "Task description"
+
+#: task/views.py:175
+msgid "Пользователь {} внес правки:\n"
+msgstr "User {} changed:\n"
+
+#: task/views.py:196
+msgid "{} изменен(а) с \"{}\" на \"{}\"\n"
+msgstr "{} changed from \"{}\" to \"{}\"\n"
+
+#: task/views.py:211
+msgid "Пользователь {} добавил вложение {}"
+msgstr "User {} has added attachment {}"
+
+#: task/views.py:272
+msgid ""
+"У вас нет прав на редактирование данной задачи. <a href=\"{}\">Назад</a>"
+msgstr "You've got no permissions to edit this task. <a href=\"{}\">Back</a>"
+
+#: task/views.py:291 task/views.py:311
+msgid "Неправильно введены данные."
+msgstr "Input data is invalid."
+
+#: task/views.py:327
+msgid "Файл не найден или не существует."
+msgstr "File not found."

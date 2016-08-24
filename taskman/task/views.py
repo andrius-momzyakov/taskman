@@ -18,6 +18,7 @@ import django.db as db
 from django.db.models import Q
 from django.db.models.expressions import F
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from django.conf import settings
@@ -152,8 +153,8 @@ class NewTask(View):
 
 
 class EditTaskForm(forms.ModelForm):
-    file = forms.FileField(label=_('Файл'), required=False)
-    comment = forms.CharField(label=_('Комментарий'), widget=forms.Textarea, required=False)
+    file = forms.FileField(label=ugettext_lazy('Файл'), required=False)
+    comment = forms.CharField(label=ugettext_lazy('Комментарий'), widget=forms.Textarea, required=False)
 
     class Meta:
         model = Task
