@@ -147,7 +147,7 @@ class TaskView(models.Model):
                                    default=datetime.now)
     updated_by = models.ForeignKey(User, related_name='vupdater', on_delete=models.DO_NOTHING,
                                    verbose_name='Изменил', null=True, blank=True)
-    status = models.CharField(verbose_name='Статус', max_length=30, choices=Task.STATUSES)
+    status = models.CharField(verbose_name='Статус', max_length=30, choices=Task.STATUSES, null=True, blank=True)
     closed = models.DateTimeField(verbose_name='Когда закрыта', null=True, blank=True)
     close_reason = models.CharField(max_length=2, verbose_name='Тип закрытия', null=True,
                                     blank=True, choices=Task.CLOSE_REASONS)
