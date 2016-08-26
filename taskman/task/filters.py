@@ -35,11 +35,3 @@ class TaskFilter(f.FilterSet):
     def get_qs_by_comment(queryset, value):
         return queryset.filter(pk__in=[comment.task.id for comment in m.Comment.objects.filter(body__icontains=value)])
 
-    @staticmethod
-    def get_qs_by_comment(queryset, value):
-        qs = queryset
-        if value==TaskFilter.OPEN:
-            qs = qs.filter(~Q(status=m.Task.CLOSED))
-        elif value==TaskFilter.CLOSED:
-            qs = qs.filter(Q(status=m.Task.CLOSED))
-        return qs
