@@ -26,7 +26,7 @@ class TaskFilter(f.FilterSet):
     class Meta:
         model = m.TaskView
         fields = ['subject', 'desc', 'created', 'closed', 'status', 'close_reason']
-        # TODO: add class attr to date range filterss
+        # TODO: add class attr to date range filters
         widgets = {
             'created': forms.TextInput(attrs={'class': 'dt-picker'}),
             'closed': forms.TextInput(attrs={'class': 'dt-picker'}),
