@@ -8,6 +8,13 @@ Sandbox version is present at http://amomzyakov.pythonanywhere.com/task/
 
 ## Installation guide
 
+### Requirements
+
+Uses django-filter module.
+Install it into virtualenv or systemwide with
+
+`pip install django-filter`
+
 Under construction.
 
 ##
