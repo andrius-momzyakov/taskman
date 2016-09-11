@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 
 {% block title %}Список задач{% endblock %}
 {% block content %}
@@ -9,7 +10,12 @@
     {% for field in filter_form %}
         {{field.errors}}
         {{field.label_tag}}
-        {{field}}
+        {% if field.name == 'created' or field.name == 'closed' %}
+            <!--{{field|add_class:"dt-picker"}}-->
+            {% render_field field class+="d-picker" %}
+        {% else %}
+            {{field}}
+        {% endif %}
     {% endfor %}
     <input type="submit" value="Применить"/>
     </form>
