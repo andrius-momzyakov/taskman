@@ -30,13 +30,13 @@
         <th>Закрыто</th>
         </tr></thead>
         <tfoot>
-           <tr><td>
+           <tr><td colspan="12">
             <ul class="pagination">
                 {% for pagenum in page_numbers %}
                     {% if user.is_authenticated %}
-                        <li id="page{{ pagenum }}"><a href = "{% url 'home' pagenum %}">{{ pagenum }}</a></li>
+                        <li id="page{{ pagenum }}"><a href = "{% url 'home' pagenum %}{{ get_qry }}">{{ pagenum }}</a></li>
                     {% else %}
-                        <li id="page{{ pagenum }}"><a href = "{% url 'anonymous_home' pagenum %}">{{ pagenum }}</a></li>
+                        <li id="page{{ pagenum }}"><a href = "{% url 'anonymous_home' pagenum %}{{ get_qry }}">{{ pagenum }}</a></li>
                     {% endif%}
                 {% endfor%}
             </ul>

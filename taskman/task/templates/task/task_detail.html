@@ -2,27 +2,33 @@
 
 {% block title %}Описание задачи{% endblock %}
 {% block content %}
-<h1>{{ object.subject }}</h1>
+<div class="container">
+<h1>Задача #{{ object.id }}</h1>
 <button onclick="parent.location='{% url 'edit' object.id %}'">Изменить</button>
 <!--<a href="{% url 'edit' object.id %}">Изменить</a> -->
 <hr>
-<table class="detail">
-    
-<tr><td><div><b>Тип:</b></div></td><td><div>{{ object.type }}</div></div></td></tr>
-<tr><td><div><b>Описание:</b></div></td><td><div><code><pre>{{ object.desc }}</pre></code></div></td></tr>
-<tr><td><div><b>Создано:</b></div></td><td><div>{{ object.created|date:'d.m.Y H:i'|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Заявитель:</b></div></td><td><div>{{ object.created_by|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Исполнитель:</b></div></td><td><div>{{ object.executor|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Крайний срок:</b></div></td><td><div>{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Частная:</b></div></td><td><div>{{ object.get_private_literal}}</div></td></tr>
-<tr><td><div><b>Проект:</b></div></td><td><div>{{ object.project|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Модуль:</b></div></td><td><div>{{ object.module|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Статус:</b></div></td><td><div>{{ object.get_status_literal|default_if_none:"" }}</div></td></tr>
-<tr><td><div><b>Закрыто:</b></div></td><td><div>{{ object.closed|date:"d.m.Y H:i"|default_if_none:"" }}</div></td></tr>
-{% if object.parent %}
-<tr><td><div><b>Родительская задача:</b></div></td><td><div><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></div></td></tr>
-{% endif %}
+<div style="width: 700px;">
+    <table class="table">
+            <!--class="detail"> -->
+    <tbody>
+    <tr><th style="width: 200px;">Предмет:</th><td style="width: 500px;"><h4>{{ object.subject }}</h4></td></tr>
+    <tr><th style="width: 200px;">Тип:</th><td style="width: 500px;">{{ object.type }}</td></tr>
+    <tr><th style="width: 200px;">Описание:</th><td style="width: 500px; display: block; overflow: auto;"><pre>{{ object.desc }}</pre></td></tr>
+    <tr><th style="width: 200px;">Создано:</th><td style="width: 500px;">{{ object.created|date:'d.m.Y H:i'|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Заявитель:</th><td style="width: 500px;">{{ object.created_by|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Исполнитель:</th><td style="width: 500px;">{{ object.executor|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Крайний срок:</th><td style="width: 500px;">{{ object.deadline_date|date:"d.m.Y H:i"|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Частная:</th><td style="width: 500px;">{{ object.get_private_literal}}</td></tr>
+    <tr><th style="width: 200px;">Проект:</th><td style="width: 500px;">{{ object.project|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Модуль:</th><td style="width: 500px;">{{ object.module|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Статус:</th><td style="width: 500px;">{{ object.get_status_literal|default_if_none:"" }}</td></tr>
+    <tr><th style="width: 200px;">Закрыто:</th><td style="width: 500px;">{{ object.closed|date:"d.m.Y H:i"|default_if_none:"" }}</td></tr>
+    {% if object.parent %}
+    <tr><th style="width: 200px;">Родительская задача:</th><td style="width: 500px;"><a href="{% url 'detail' object.parent.id %}">{{ object.parent.subject }}</a></td></tr>
+    {% endif %}
+    </tbody>
     </table>
+</div>
 
 {% if children %}
 <h2>Подзадачи</h2>
@@ -39,16 +45,19 @@
 {% endfor %}
 
 {% if comments %}
-<h2>Комментарии:</h2>
-<table>
-{% for comment in comments%}
-
-    <tr class="detail">
-        <td>{{ comment.author }}</td>
-        <td>{{ comment.created|date:"d.m.Y" }}</td>
-        <td><pre>{{ comment.body }}</pre></td>
-</tr>
-    {% endfor %}
-</table>
+<h2>Комментарии</h2>
+<div style="width: 700px;">
+    <table class="table">
+        {% for comment in comments%}
+        <tr>
+        <td style="width: 700px;">{{ comment.author }}&nbsp;&nbsp;&nbsp;{{ comment.created|date:"d.m.Y" }}</td>
+        </tr>
+        <tr >
+            <td style="width: 700px; display: block; overflow: auto;"><pre>{{ comment.body }}</pre></td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
     {% endif %}
+    </div>
 {% endblock %}
