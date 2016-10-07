@@ -2,5 +2,7 @@
 
 {% block title %}Ошибка в приложении{% endblock %}
 {% block content %}
-<h1>{{ message }}</h1>
+{% autoescape off %}
+<h3 style="color: red;">{{ message }}</h3>
+{% endautoescape %}
 {% endblock %}

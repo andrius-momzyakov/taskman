@@ -8,6 +8,8 @@
 		<script type="text/javascript" src="{% static 'jquery-1.11.1.min.js'%}"></script>
 		<script type="text/javascript" src="{% static 'jquery-ui.min.js'%}"></script>
 		<script type="text/javascript" src="{% static 'jquery-ui-timepicker-addon.js' %}"></script>
+		<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+		<script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
         <script>
             $.datepicker.regional['ru'] = {
             closeText: 'Закрыть',
@@ -57,95 +59,60 @@
 
     <link rel="stylesheet" media="all" type="text/css" href="{% static 'jquery-ui.css'%}" />
     <link rel="stylesheet" media="all" type="text/css" href="{% static 'jquery-ui-timepicker-addon.css'%}" />
-    <style>
-        li.menu_item { display:inline;
-                        #float:left;
-                        }
-        li.menu_item a { background-color: rgb(80,80,80);
-                        color: white;
-                        padding: 10px 20px;
-                        text-decoration: none;
-                        border-radius: 0 0 4px 4px; }
-        li.menu_item a:hover { font-weight: bold;
-                               color: pink;
-                               background-color: rgb(60,60,60);}
-        header {background-color: rgb(80,80,80);
-                        color: white;
-                        padding: 10px 20px;
-                        text-decoration: none;
-                        border-radius: 4px 4px 0 0;
-                        font-size: 150%;
-                        min-height:30px;}
-        footer {background-color: rgb(150,150,150);
-                    color: white;
-                    padding: 10px 20px;
-                    text-decoration: none;
-                    border-radius: 0 0 4px 4px;
-                    font-size:70%;
-                    min-height:20px;}
-        div.header{position:relative;
+    <link rel="stylesheet" media="all" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}"/>
+    <link rel="stylesheet" media="all" type="text/css" href="{% static 'bootstrap/css/bootstrap-theme.css' %}"/>
+    <style>div.my_header{position:relative;
                         width:70%;
                         text-align:center;
                         float:left;
                         #padding:inherit;
                         #min-height:inherit;
                         }
-        div.header_info {position:relative;
+        div.my_header_info {position:relative;
                                 float:right;
                                 width:20%;
                                 font-size:14px;
                                 padding:inherit;
                                 #min-height:inherit;
-                                }
-        p.footer {display:inline;
-                  padding: 0 20px;}
-        table.detail td div {margin-top: 10px;
-        }
-        table.detail td {border-bottom: 1px solid black;
-        }
-        form table th {text-align: right;
-        }
-    </style>
+                                }</style>
 </head>
 <body>
-<header><div class="header" >Система учета личных задач "Ежедневник"</div>
-    <div class="header_info">
-        {% if user.is_authenticated %}
-           Вы вошли как: {{ user }}
-        {% endif %}
-    </div></header>
-<div class="TopMenu">
+<header style="background-color: SlateGray; color: Lavender;">
+        <div style="text-align: center; width=70%; float: left; "><h1>Система учета личных задач "Ежедневник"</h1></div>
+        <div style="text-align: center; width=20%; height: 80px; ">{% if user.is_authenticated %}
+           <p>Вы вошли как: {{ user }}</p>
+        {% endif %}</div>
+</header>
 {% block menu %}
-<table>
-    <ul>
+<nav class="navbar navbar-default">
+    <ul class="nav nav-pills">
         {% if user.is_authenticated %}
-            <li class="menu_item"><a href="{% url 'new' %}">Новая задача</a></li>
-            <li class="menu_item"><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></li>
-            <li class="menu_item"><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></li>
-            <li class="menu_item">
+            <li role="presentation" ><a href="{% url 'new' %}">Новая задача</a></li>
+            <li role="presentation"><a href="{% url 'home' '1' %}?status_in=open{{ gotolast4open }}">Текущие</a></li>
+            <li role="presentation"><a href="{% url 'home' '1' %}{{ gotolast4all }}">Все</a></li>
+            <li role="presentation">
             <A href="/accounts/logout/?next=/">Выйти</A>
                 </li>
-            <li class="menu_item">
+            <li role="presentation">
                 <A href="/accounts/password_change/?next=/">Сменить
                 пароль</A>
             </li>
         {% else %}
-            <li class="menu_item"><a href="{% url 'anonymous_home' '1' %}?status_in=open">Текущие</a></li>
-            <li class="menu_item"><a href="{% url 'anonymous_home' '1' %}">Все</a></li>
-            <li class="menu_item">    <A href="/accounts/login/?next=/">Войти</A></li>
+            <li role="presentation"><a href="{% url 'anonymous_home' '1' %}?status_in=open">Текущие</a></li>
+            <li role="presentation"><a href="{% url 'anonymous_home' '1' %}">Все</a></li>
+            <li role="presentation">    <A href="/accounts/login/?next=/">Войти</A></li>
         {% endif %}
         {% if user.is_superuser or user.is_staff %}
-            <li class="menu_item"><a href="/admin/">Администрирование</a></li>
+            <li role="presentation"><a href="/admin/">Администрирование</a></li>
         {% endif %}
     </ul>
-</table>
+</nav>
 {% endblock %}
-</div>
 {% block content %}{% endblock %}
 <p></p>
 <footer>
-    <p class="footer">&copy; Момзяков Андрей Юрьевич, 2016</p><p class="footer">
-    <a href="mailto:andrius-smth@yandex.ru">Написать</a></p>
+    <div class="panel-footer" style="display: flex;"><p class="footer" style="width: 30%;">&copy; Момзяков Андрей Юрьевич, 2016</p><p class="footer" style="Width: 30%">
+    <a href="mailto:andrius-smth@yandex.ru"><span class="glyphicon glyphicon-envelope"></span>&nbsp;&nbsp;</a>Написать</p></div>
 
 </footer>
 </body>

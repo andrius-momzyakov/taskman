@@ -17,6 +17,7 @@ from django.core.urlresolvers import reverse
 import django.db as db
 from django.db.models import Q
 from django.db.models.expressions import F
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
 from .filters import TaskFilter
@@ -33,9 +34,12 @@ class TaskList(ListView):
     template_name = 'taskview_list.html'
 
     def dispatch(self, request, *args, **kwargs):
+
         if not request.user.is_authenticated():
             return redirect(reverse('anonymous_home', args=[1, ]) + request.GET.urlencode())
+
         if request.GET.get('gotolast'):
+
             if request.GET.get('gotolast').upper()=='YES':
                 status_qry_val = self.request.GET.get('status_in')
                 qs = self.get_filtered_qs(status_qry_val=status_qry_val)
@@ -45,6 +49,23 @@ class TaskList(ListView):
                 if status_qry_val:
                     qry = '?status_in={}'.format(status_qry_val)
                 return redirect(reverse('home', args=[last_page, ]) + qry)
+
+            if request.GET:
+                get_qry = request.GET.urlencode()
+                return HttpResponse(get_qry)
+                return redirect(reverse('home', args=[1,]) + '?' + get_qry)
+
+        current_page_num = int(kwargs.get('page', None))
+        get_qry = self.request.GET.urlencode()
+        if (not current_page_num is None) and (current_page_num != 1):
+            my_filter = TaskFilter(self.request.GET, self.get_filtered_qs())
+            # pag, page_obj, object_list, is_pag = self.paginate_queryset(my_filter, self.paginate_by)
+            paginator_obj = Paginator(my_filter, self.paginate_by)
+            #return HttpResponse('pag.num_pages={} current_page_num={} qry={}'.format(paginator_obj.num_pages, current_page_num, get_qry))
+            if paginator_obj.num_pages < current_page_num:
+                current_page_num = paginator_obj.num_pages
+                return redirect(reverse('home', args=[current_page_num, ]) + '?' + get_qry)
+
         return super(TaskList, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -54,6 +75,7 @@ class TaskList(ListView):
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
         filter = TaskFilter(self.request.GET, qs)
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter, self.paginate_by)
+        context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
         context['filter_form'] = filter.form
         if get_qry:
             context['get_qry'] = '?' + get_qry
@@ -71,10 +93,12 @@ class TaskList(ListView):
             qs = TaskView.objects.filter(Q(status=Task.CLOSED))
         else:
             qs = TaskView.objects.all()
+
         if self.request.user.is_authenticated():
             qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
         else:
             qs = qs.filter(Q(private=False))
+
         return qs
 
 
@@ -110,8 +134,8 @@ class TaskDetail(DetailView):
     def dispatch(self, request, *args, **kwargs):
         task = self.get_object()
         if task.private and task.created_by != request.user:
-            return HttpResponse('У вас нет прав на просмотр данной задачи. <a href="{}">Назад</a>'
-                                .format(request.META.get('HTTP_REFERER') + request.META.get('QUERY_STRING')))
+            return throw_error(request, 'У вас нет прав на просмотр данной задачи. <a href="{}">Назад</a>'
+                                .format(request.META.get('HTTP_REFERER', '') + request.META.get('QUERY_STRING', '')))
         return super(TaskDetail, self).dispatch(request, *args, **kwargs)
 
 
@@ -119,9 +143,11 @@ class NewTaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private', 'status', 'parent', ]
-        # Bootstrap styling
+
         widgets = {
             'deadline_date': forms.TextInput(attrs={'class': 'dt-picker'}),
+            'subject': forms.TextInput(attrs={'size': '80'}),
+            'desc': forms.Textarea(attrs={'cols': '80'}),
         }
 
 
@@ -156,7 +182,7 @@ class NewTask(View):
 
 class EditTaskForm(forms.ModelForm):
     file = forms.FileField(label='Файл', required=False)
-    comment = forms.CharField(label='Комментарий', widget=forms.Textarea, required=False)
+    comment = forms.CharField(label='Комментарий', widget=forms.Textarea(attrs={'cols': 80}), required=False)
 
     class Meta:
         model = Task
@@ -165,13 +191,14 @@ class EditTaskForm(forms.ModelForm):
         widgets = {
             'closed': forms.TextInput(attrs={'class': 'dt-picker'}),
             'deadline_date': forms.TextInput(attrs={'class': 'dt-picker'}),
+            'subject': forms.TextInput(attrs={'size': '80'}),
+            'desc': forms.Textarea(attrs={'cols': '80'}),
         }
 
     def save(self, commit=True, user=None):
 
         def save_comment(task_instance, body, author=user):
-            cmmt = Comment(task=task_instance, #Task.objects.get(pk=task_id),
-                           body=body, author=user)
+            cmmt = Comment(task=task_instance, body=body, author=user)
             cmmt.save()
 
         try:
@@ -211,7 +238,7 @@ class EditTaskForm(forms.ModelForm):
                              file=self.cleaned_data['file'])
             att.save()
             save_comment(task_instance=self.instance,
-                         body='Пользователь {} добавил вложение {}'.format(user, self.cleaned_data['file']),
+                         body='Пользователь {} добавил вложение "{}"'.format(user, self.cleaned_data['file']),
                          author=user)
         if self.cleaned_data['comment']:
             save_comment(task_instance=self.instance,
@@ -240,12 +267,16 @@ class EditTask(View):
 
     def get(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
+        delete_attachment_allowed = False
         if task.created_by != request.user:
             # без поля private
             form = EditTaskFormGuest(instance=task)
         else:
             form = EditTaskForm(instance=task)
+            delete_attachment_allowed = True
         context = {'form': form}
+        if delete_attachment_allowed or request.user.is_superuser:
+            context.update({'delete_attachment_allowed': True})
         context.update({'STATIC_URL':settings.STATIC_URL})
         self.add_context(task, context)
         return render_to_response(template_name=self.template, context=context,
@@ -273,8 +304,8 @@ class EditTask(View):
     def dispatch(self, request, task_id, *args, **kwargs):
         task = get_object_or_404(Task, pk=task_id)
         if task.private and task.created_by != request.user:
-            return HttpResponse('У вас нет прав на редактирование данной задачи. <a href="{}">Назад</a>'
-                                .format(request.META.get('HTTP_REFERER') + request.META.get('QUERY_STRING')))
+            return throw_error(request, 'У вас нет прав на редактирование данной задачи. <a href="{}">Назад</a>'
+                                .format(request.META.get('HTTP_REFERER', '') + request.META.get('QUERY_STRING', '')))
         return super(EditTask, self).dispatch(request, task_id, *args, **kwargs)
 
 
@@ -292,7 +323,7 @@ class NewAttachment(View):
                              , file=request.FILES['file'])
             att.save()
             return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
-        return HttpResponse('Неправильно введены данные.')
+        return throw_error(request, 'Неправильно введены данные о вложении.')
 
 
 def delete_task_attachment(request, a_id):
@@ -304,16 +335,23 @@ def delete_task_attachment(request, a_id):
     '''
     obj_id = int(a_id)
     obj = Attachment.objects.get(pk=obj_id)
-    ospath = settings.MEDIA_ROOT
-    try:
-        os.remove(ospath + obj.file.name)
-    except OSError:
-        try:
-            os.remove(ospath + obj.file.name[1:])
-        except FileNotFoundError:
-            pass
     task = obj.task
-    obj.delete()
+    if request.user.is_superuser or request.user == task.created_by:
+        ospath = settings.MEDIA_ROOT
+        try:
+            os.remove(ospath + obj.file.name)
+        except OSError:
+            try:
+                os.remove(ospath + obj.file.name[1:])
+            except FileNotFoundError:
+                pass
+        obj.delete()
+        body = 'Пользователь {} удалил вложение "{}".'.format(request.user, obj.file.name)
+        commnt = Comment(task=task, body=body, author=request.user)
+        commnt.save()
+    else:
+        throw_error(request, 'Удалять вложения может только заявитель (автор) задачи. <a href="{}">Назад</a>'
+                                .format(request.META.get('HTTP_REFERER', '') + request.META.get('QUERY_STRING', '')))
     return redirect(reverse('edit', args=[task.id,]))
 
 
@@ -334,7 +372,7 @@ class NewComment(View):
             comment.task = Task.objects.get(pk=int(form.cleaned_data['task']))
             comment.save()
             return redirect(reverse('detail', args=[form.cleaned_data['task'], ]))
-        return HttpResponse('Неправильно введены данные.')
+        return throw_error(request, 'Неправильно введен комментарий.')
 
 
 #@login_required
@@ -376,3 +414,15 @@ def update_task_priority(request, task_id=None, increase=None):
     else:
         new_priority.priority = F('id')
     new_priority.save()
+
+def throw_error(request, message):
+    return ShowErrorMessage().get(request, message=message)
+
+class ShowErrorMessage(View):
+    template = 'error.html'
+    #message = None
+
+    def get(self, request, message, *args, **kwargs):
+        context = {'message': message}
+        return render(request, template_name=self.template, context=context)
+
