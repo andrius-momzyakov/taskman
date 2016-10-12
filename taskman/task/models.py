@@ -177,4 +177,13 @@ class TaskView(models.Model):
         return self.subject
 
 
+class OnlineSettings(models.Model):
+    '''
+    Online application settings - changes don't require restarting server
+    '''
+    code = models.CharField(max_length=30, verbose_name='Код параметра', unique=True)
+    name = models.CharField(max_length=100, verbose_name='Человекочитаемое название параметра')
+    value = models.CharField(max_length=30, verbose_name='Значение')
 
+    def __str__(self):
+        return '{} = {}'.format(self.name, self.value)

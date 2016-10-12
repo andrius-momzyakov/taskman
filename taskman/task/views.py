@@ -19,13 +19,22 @@ from django.db.models import Q
 from django.db.models.expressions import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView
+from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings
 from .filters import TaskFilter
 from django.conf import settings
 
 
 
 # Create your views here.
+
+def check_setting(key, val):
+    try:
+        setting = OnlineSettings.objects.get(code=key)
+        if setting.value == val:
+            return True
+    except OnlineSettings.DoesNotExist:
+        return False
+
 
 class TaskList(ListView):
     # request.GET.urlencode()
@@ -36,6 +45,8 @@ class TaskList(ListView):
     def dispatch(self, request, *args, **kwargs):
 
         if not request.user.is_authenticated():
+            if check_setting('VEIL_LIST', 'Y'):
+                return redirect(reverse('login', ) + '?next=' + request.path)
             return redirect(reverse('anonymous_home', args=[1, ]) + request.GET.urlencode())
 
         if request.GET.get('gotolast'):
@@ -110,6 +121,8 @@ class AnonymousTaskList(TaskList):
     template_name = 'taskview_list.html'
 
     def dispatch(self, request, *args, **kwargs):
+        if check_setting('VEIL_LIST', 'Y'):
+            return redirect(reverse('login', ) + '?next=' + request.path)
         return super(TaskList, self).dispatch(request, *args, **kwargs)
 
 
@@ -378,6 +391,8 @@ class NewComment(View):
 #@login_required
 def root(request):
     if not request.user.is_authenticated():
+        if check_setting('VEIL_LIST', 'Y'):
+            return redirect(reverse('login', ) + '?next=' + request.path)
         return redirect(reverse('anonymous_home', args=[1, ])  + '?status_in=open')
     return redirect(reverse('home', args=[1, ])  + '?status_in=open')
 
