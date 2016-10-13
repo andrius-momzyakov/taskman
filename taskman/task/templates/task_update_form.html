@@ -33,7 +33,7 @@
     <table class="table">
         {% for comment in comments%}
         <tr>
-        <td style="width: 700px;">{{ comment.author }}&nbsp;&nbsp;&nbsp;{{ comment.created|date:"d.m.Y" }}</td>
+        <td style="width: 700px;">{{ comment.author }}&nbsp;&nbsp;&nbsp;{{ comment.created|date:"d.m.Y H:i" }}</td>
         </tr>
         <tr >
             <td style="width: 700px; display: block; overflow: auto;"><pre>{{ comment.body }}</pre></td>

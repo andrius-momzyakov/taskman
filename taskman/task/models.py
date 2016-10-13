@@ -104,6 +104,9 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', null=True, blank=True)
     attachments = models.ManyToManyField('Attachment', verbose_name='Файлы', blank=True)
 
+    class Meta:
+        ordering = ['created']
+
     def __str__(self):
         return str(self.task) + ' ' + self.created.strftime('%Y.%m.%d %H:%M')
 
