@@ -22,9 +22,9 @@
         <th>Тип карточки</th>
         <th>Предмет</th>
         <th>Проект</th>
-        <th>Модуль</th>
         <th>Автор</th>
         <th>Дата созд.</th>
+        <th>Срок исп.</th>
         <th>Исполнитель</th>
         <th>Статус</th>
         <th>Закрыто</th>
@@ -59,9 +59,9 @@
             <td>{{ task.type }}</td>
             <td>{{ task.subject }}</td>
             <td>{{ task.project|default_if_none:"" }}</td>
-            <td>{{ task.module|default_if_none:"" }}</td>
             <td>{{ task.created_by|default_if_none:"" }}</td>
             <td>{{ task.created|default_if_none:""|date:"d.m.Y H:i" }}</td>
+            <td>{{ task.deadline_date|default_if_none:""|date:"d.m.Y H:i" }}</td>
             <td>{{ task.executor|default_if_none:"" }}</td>
             <td>{{ task.get_status_literal|default_if_none:"" }}</td>
             <td>{{ task.closed|date:"d.m.Y H:i"|default_if_none:"" }}</td>
