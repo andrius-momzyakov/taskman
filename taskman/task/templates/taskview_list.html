@@ -7,11 +7,27 @@
     $(document).ready(function(){
 
         $('#page{{page_obj.number}}').addClass("active");
+        $("input[name='subject'], input[name='desc']").addClass("form-control");
+        $("label").addClass("control-label");
 
 });
 </script>
 <div class="container">
 <h2 >Список задач</h2>
+
+                <form method="GET" action="" role="form" class="form-inline">
+                    {{filter_form.errors}}
+                    {% for field in filter_form %}
+                        <div class="form-group">
+                        {{field.errors}}
+                        {{field.label_tag}}<br/>
+                        {{field}}
+                        </div>
+                    {% endfor %}
+                <input type="submit" value="Найти" class="btn btn-success"/>
+                <input type="reset" value="Очистить" class="btn btn-reset"/>
+                </form>
+    <hr/>
     <table class="table table-hover">
         <thead><tr>
         {% if user.is_authenticated %}

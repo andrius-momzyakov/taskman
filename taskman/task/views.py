@@ -35,6 +35,27 @@ def check_setting(key, val):
     except OnlineSettings.DoesNotExist:
         return False
 
+class MyFilterForm(forms.Form):
+    subject = forms.CharField(max_length=255, label='Задача', initial=' ', required=False)
+    desc = forms.CharField(max_length=255, label='Описание', initial=' ', required=False)
+
+class MyFilter:
+    def __init__(self, request, qs):
+        self.request = request
+        self.form = MyFilterForm(request.GET)
+        self.qs = qs
+
+    def filter(self):
+        if self.form.is_valid():
+            _subject = self.form.cleaned_data['subject']
+            _desc = self.form.cleaned_data['desc']
+            _qs = self.qs
+            if _subject:
+                _qs = _qs.filter(subject__icontains=_subject)
+            if _desc:
+                _qs = _qs.filter(desc__icontains=_desc)
+            return _qs
+
 
 class TaskList(ListView):
     # request.GET.urlencode()
@@ -69,7 +90,8 @@ class TaskList(ListView):
         current_page_num = int(kwargs.get('page', None))
         get_qry = self.request.GET.urlencode()
         if (not current_page_num is None) and (current_page_num != 1):
-            my_filter = TaskFilter(self.request.GET, self.get_filtered_qs())
+            # my_filter = TaskFilter(self.request.GET, self.get_filtered_qs())
+            my_filter = MyFilter(self.request, self.get_filtered_qs()).filter()
             # pag, page_obj, object_list, is_pag = self.paginate_queryset(my_filter, self.paginate_by)
             paginator_obj = Paginator(my_filter, self.paginate_by)
             #return HttpResponse('pag.num_pages={} current_page_num={} qry={}'.format(paginator_obj.num_pages, current_page_num, get_qry))
@@ -84,10 +106,11 @@ class TaskList(ListView):
         get_qry = self.request.GET.urlencode()
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
-        filter = TaskFilter(self.request.GET, qs)
-        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter, self.paginate_by)
+        # filter = TaskFilter(self.request.GET, qs)
+        filter = MyFilter(self.request, qs)
+        pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
-        context['filter_form'] = filter.form
+        context['filter_form'] = MyFilterForm(self.request.GET)  # filter.form
         if get_qry:
             context['get_qry'] = '?' + get_qry
         return context
