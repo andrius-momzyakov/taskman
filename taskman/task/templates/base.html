@@ -59,7 +59,6 @@
         $.timepicker.setDefaults($.timepicker.regional['ru']);
 
           $( function() {
-            // $( "#id_deadline_date" ).datetimepicker();
             $( ".dt-picker" ).datetimepicker();
             $( ".d-picker" ).datepicker();
           } );
@@ -83,6 +82,7 @@
                                 padding:inherit;
                                 #min-height:inherit;
                                 }</style>
+    {% block pagestyle %}{% endblock %}
 </head>
 <body>
 <header style="background-color: SlateGray; color: Lavender;">

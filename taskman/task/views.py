@@ -35,9 +35,19 @@ def check_setting(key, val):
     except OnlineSettings.DoesNotExist:
         return False
 
+
 class MyFilterForm(forms.Form):
     subject = forms.CharField(max_length=255, label='Задача', initial=' ', required=False)
     desc = forms.CharField(max_length=255, label='Описание', initial=' ', required=False)
+    status = forms.MultipleChoiceField(label="Статус", choices=Task.STATUSES, required=False)
+    closed1 = forms.DateTimeField(label="Дата закрытия от", required=False)
+    closed2 = forms.DateTimeField(label="Дата закрытия до", required=False)
+
+    widgets = {
+        'closed1': forms.TextInput(attrs={'class': 'dt-picker'}),
+        'closed2': forms.TextInput(attrs={'class': 'dt-picker'}),
+    }
+
 
 class MyFilter:
     def __init__(self, request, qs):
@@ -49,11 +59,20 @@ class MyFilter:
         if self.form.is_valid():
             _subject = self.form.cleaned_data['subject']
             _desc = self.form.cleaned_data['desc']
+            _statuses = self.form.cleaned_data['status']
+            _closed1 = self.form.cleaned_data['closed1']
+            _closed2 = self.form.cleaned_data['closed2']
             _qs = self.qs
             if _subject:
                 _qs = _qs.filter(subject__icontains=_subject)
             if _desc:
                 _qs = _qs.filter(desc__icontains=_desc)
+            if _statuses:
+                _qs = _qs.filter(status__in=[s for s in _statuses])
+            if _closed1:
+                _qs = _qs.filter(closed__gte=_closed1)
+            if _closed2:
+                _qs = _qs.filter(closed__lte=_closed2)
             return _qs
 
 
