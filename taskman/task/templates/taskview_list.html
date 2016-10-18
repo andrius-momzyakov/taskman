@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 
+{% block pagestyle %}
+<style>
+    #serch_form.hidden{
+        display:none;
+    }
+    #search_form.apparent{
+        display:block;
+    }
+</style>
+{% endblock %}
 {% block title %}Список задач{% endblock %}
 {% block content %}
 <script>
@@ -8,10 +18,38 @@
 
         $('#page{{page_obj.number}}').addClass("active");
 
+        //$("input[name='subject'], input[name='desc'], #id_status, #id_closed1, #id_closed2").addClass("form-control");
+        $("input, select").addClass("form-control");
+        $("input.btn").removeClass("form-control");
+        $("#id_closed1, #id_closed2, #id_dd_date1, #id_dd_date2, #id_created1, #id_created2").datetimepicker();
+        $("label").addClass("control-label");
+        $("#switch_filter_form").on("click", function(){
+          current_class = $("#search_form").attr("class");
+          if (current_class.indexOf('hidden') >= 0){
+            $("#search_form").removeClass('hidden').addClass('apparent');
+          } else {
+            $("#search_form").removeClass('apparent').addClass('hidden');
+          }
+        });
+
 });
 </script>
 <div class="container">
-<h2 >Список задач</h2>
+<h2 style="display: inline; margin-right: 0em;">Список задач</h2>
+    <button id="switch_filter_form" class="btn" style="display: inline;">Показать/Скрыть фильтр</button>
+                <form id="search_form" method="GET" action="" role="form" class="form-inline hidden">
+                    {{filter_form.errors}}
+                    {% for field in filter_form %}
+                        <div class="form-group">
+                        {{field.errors}}
+                        {{field.label_tag}}<br/>
+                        {{field}}
+                        </div>
+                    {% endfor %}
+                <input type="submit" value="Найти" class="btn btn-success"/>
+                <input type="reset" value="Очистить" class="btn btn-reset"/>
+                <hr/>
+                </form>
     <table class="table table-hover">
         <thead><tr>
         {% if user.is_authenticated %}
