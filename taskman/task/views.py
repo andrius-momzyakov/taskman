@@ -19,8 +19,9 @@ from django.db.models import Q
 from django.db.models.expressions import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings
-from .filters import TaskFilter
+from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings, \
+                    Project
+
 from django.conf import settings
 
 
@@ -36,17 +37,46 @@ def check_setting(key, val):
         return False
 
 
+class TaskForeignKeyChoices:
+    @classmethod
+    def get_created_by_choices(cls):
+        # TODO: filter choices depending on user's profile
+        return [(user.id, user) for user in User.objects.all()]
+
+    @classmethod
+    def get_executor_choices(cls):
+        # TODO: filter choices depending on user's profile
+        return [(user.id, user) for user in User.objects.all()]
+
+    @classmethod
+    def get_project_choices(cls):
+        # TODO: filter choices depending on user's profile
+        return [(project.id, project) for project in Project.objects.all()]
+
+    @classmethod
+    def get_type_choices(cls):
+        return [(tt.id, tt) for tt in TaskType.objects.all()]
+
+
 class MyFilterForm(forms.Form):
-    subject = forms.CharField(max_length=255, label='Задача', initial=' ', required=False)
-    desc = forms.CharField(max_length=255, label='Описание', initial=' ', required=False)
+    type = forms.MultipleChoiceField(label="Тип задачи", choices=TaskForeignKeyChoices.get_type_choices, required=False)
+    subject = forms.CharField(max_length=255, label='Задача', initial='', required=False)
+    desc = forms.CharField(max_length=255, label='Описание', initial='', required=False)
+    cmmnt = forms.CharField(max_length=255, label='Комментарий', initial='', required=False)
+    created_by = forms.MultipleChoiceField(label="Автор", choices=TaskForeignKeyChoices.get_created_by_choices(),
+                                           required=False)
+    executor = forms.MultipleChoiceField(label="Исполнитель", choices=TaskForeignKeyChoices.get_executor_choices,
+                                         required=False)
+    project = forms.MultipleChoiceField(label="Проект", choices=TaskForeignKeyChoices.get_project_choices,
+                                        required=False)
     status = forms.MultipleChoiceField(label="Статус", choices=Task.STATUSES, required=False)
+    close_reason = forms.MultipleChoiceField(label="Тип закрытия", choices=Task.CLOSE_REASONS, required=False)
+    created1 = forms.DateTimeField(label="Дата создания от", required=False)
+    created2 = forms.DateTimeField(label="Дата создания до", required=False)
+    dd_date1 = forms.DateTimeField(label="Срок от", required=False)
+    dd_date2 = forms.DateTimeField(label="Срок до", required=False)
     closed1 = forms.DateTimeField(label="Дата закрытия от", required=False)
     closed2 = forms.DateTimeField(label="Дата закрытия до", required=False)
-
-    widgets = {
-        'closed1': forms.TextInput(attrs={'class': 'dt-picker'}),
-        'closed2': forms.TextInput(attrs={'class': 'dt-picker'}),
-    }
 
 
 class MyFilter:
@@ -57,18 +87,49 @@ class MyFilter:
 
     def filter(self):
         if self.form.is_valid():
+            _type = self.form.cleaned_data['type']
             _subject = self.form.cleaned_data['subject']
             _desc = self.form.cleaned_data['desc']
+            _cmmnt = self.form.cleaned_data['cmmnt']
+            _created_by = self.form.cleaned_data['created_by']
+            _executor = self.form.cleaned_data['executor']
+            _project = self.form.cleaned_data['project']
             _statuses = self.form.cleaned_data['status']
+            _close_reason = self.form.cleaned_data['close_reason']
+            _created1 = self.form.cleaned_data['created1']
+            _created2 = self.form.cleaned_data['created2']
+            _dd_date1 = self.form.cleaned_data['dd_date1']
+            _dd_date2 = self.form.cleaned_data['dd_date2']
             _closed1 = self.form.cleaned_data['closed1']
             _closed2 = self.form.cleaned_data['closed2']
             _qs = self.qs
+            if _type:
+                _qs = _qs.filter(type__in=[TaskType.objects.get(pk=int(t[0])) for  t in _type])
             if _subject:
                 _qs = _qs.filter(subject__icontains=_subject)
             if _desc:
                 _qs = _qs.filter(desc__icontains=_desc)
+            if _cmmnt:
+                _cmmnt_qs = Comment.objects.filter(body__icontains=_cmmnt)
+                _qs = _qs.filter(pk__in=[cmmnt.task.id for cmmnt in _cmmnt_qs])
+            if _created_by:
+                _qs = _qs.filter(created_by__in=[User.objects.get(pk=int(user[0])) for user in _created_by])
+            if _executor:
+                _qs = _qs.filter(executor__in=[User.objects.get(pk=int(user[0])) for user in _executor])
+            if _project:
+                _qs = _qs.filter(project__in=[Project.objects.get(pk=int(pr[0])) for pr in _project])
             if _statuses:
                 _qs = _qs.filter(status__in=[s for s in _statuses])
+            if _close_reason:
+                _qs = _qs.filter(close_reason__in=[s for s in _close_reason])
+            if _created1:
+                _qs = _qs.filter(closed__gte=_created1)
+            if _created2:
+                _qs = _qs.filter(closed__lte=_created2)
+            if _dd_date1:
+                _qs = _qs.filter(closed__gte=_dd_date1)
+            if _dd_date2:
+                _qs = _qs.filter(closed__lte=_dd_date2)
             if _closed1:
                 _qs = _qs.filter(closed__gte=_closed1)
             if _closed2:

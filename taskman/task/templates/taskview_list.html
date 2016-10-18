@@ -18,8 +18,10 @@
 
         $('#page{{page_obj.number}}').addClass("active");
 
-        $("input[name='subject'], input[name='desc'], #id_status, #id_closed1, #id_closed2").addClass("form-control");
-        $("#id_closed1, #id_closed2").datetimepicker();
+        //$("input[name='subject'], input[name='desc'], #id_status, #id_closed1, #id_closed2").addClass("form-control");
+        $("input, select").addClass("form-control");
+        $("input.btn").removeClass("form-control");
+        $("#id_closed1, #id_closed2, #id_dd_date1, #id_dd_date2, #id_created1, #id_created2").datetimepicker();
         $("label").addClass("control-label");
         $("#switch_filter_form").on("click", function(){
           current_class = $("#search_form").attr("class");
@@ -35,7 +37,7 @@
 <div class="container">
 <h2 style="display: inline; margin-right: 0em;">Список задач</h2>
     <button id="switch_filter_form" class="btn" style="display: inline;">Показать/Скрыть фильтр</button>
-                <form id="search_form" method="GET" action="" role="form" class="form-inline">
+                <form id="search_form" method="GET" action="" role="form" class="form-inline hidden">
                     {{filter_form.errors}}
                     {% for field in filter_form %}
                         <div class="form-group">
