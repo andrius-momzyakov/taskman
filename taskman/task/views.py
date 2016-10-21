@@ -59,6 +59,7 @@ class TaskForeignKeyChoices:
 
 
 class MyFilterForm(forms.Form):
+    id = forms.IntegerField(label="#", required=False)
     type = forms.MultipleChoiceField(label="Тип задачи", choices=TaskForeignKeyChoices.get_type_choices, required=False)
     subject = forms.CharField(max_length=255, label='Задача', initial='', required=False)
     desc = forms.CharField(max_length=255, label='Описание', initial='', required=False)
@@ -87,6 +88,7 @@ class MyFilter:
 
     def filter(self):
         if self.form.is_valid():
+            _id = self.form.cleaned_data['id']
             _type = self.form.cleaned_data['type']
             _subject = self.form.cleaned_data['subject']
             _desc = self.form.cleaned_data['desc']
@@ -103,6 +105,8 @@ class MyFilter:
             _closed1 = self.form.cleaned_data['closed1']
             _closed2 = self.form.cleaned_data['closed2']
             _qs = self.qs
+            if _id:
+                _qs = _qs.filter(id=int(_id))
             if _type:
                 _qs = _qs.filter(type__in=[TaskType.objects.get(pk=int(t[0])) for  t in _type])
             if _subject:

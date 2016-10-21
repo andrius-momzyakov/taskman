@@ -23,6 +23,7 @@
         $("input.btn").removeClass("form-control");
         $("#id_closed1, #id_closed2, #id_dd_date1, #id_dd_date2, #id_created1, #id_created2").datetimepicker();
         $("label").addClass("control-label");
+        $("#id_id").width("80px")
         $("#switch_filter_form").on("click", function(){
           current_class = $("#search_form").attr("class");
           if (current_class.indexOf('hidden') >= 0){
