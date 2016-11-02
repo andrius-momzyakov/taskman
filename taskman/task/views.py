@@ -49,9 +49,20 @@ class TaskForeignKeyChoices:
         return [(user.id, user) for user in User.objects.all()]
 
     @classmethod
-    def get_project_choices(cls):
+    def get_project_choices(cls, user=None):
         # TODO: filter choices depending on user's profile
-        return [(project.id, project) for project in Project.objects.all()]
+        try:
+            profile = UserProfile.objects.get(user=user)
+        except:
+            profile = None
+        qs = None
+        if profile:
+            if profile.project_can_access.count() > 0:
+                qs = profile.project_can_access.all()
+        if not qs:
+            qs = Project.objects.all()
+
+        return [(project.id, project) for project in qs]
 
     @classmethod
     def get_type_choices(cls):
@@ -59,6 +70,14 @@ class TaskForeignKeyChoices:
 
 
 class MyFilterForm(forms.Form):
+    def __init__(self, *args, user=None, **kwargs):
+        super(MyFilterForm, self).__init__(*args, *kwargs)
+        _choices = TaskForeignKeyChoices.get_project_choices(user=user)
+        # print(_choices)
+        self.fields['project'] = forms.MultipleChoiceField(label="Проект",
+                                                           choices=_choices,
+                                                           required=False)
+
     id = forms.IntegerField(label="#", required=False)
     type = forms.MultipleChoiceField(label="Тип задачи", choices=TaskForeignKeyChoices.get_type_choices, required=False)
     subject = forms.CharField(max_length=255, label='Задача', initial='', required=False)
@@ -68,8 +87,7 @@ class MyFilterForm(forms.Form):
                                            required=False)
     executor = forms.MultipleChoiceField(label="Исполнитель", choices=TaskForeignKeyChoices.get_executor_choices,
                                          required=False)
-    project = forms.MultipleChoiceField(label="Проект", choices=TaskForeignKeyChoices.get_project_choices,
-                                        required=False)
+    project = forms.MultipleChoiceField(label="Проект", choices=TaskForeignKeyChoices.get_project_choices, required = False)
     status = forms.MultipleChoiceField(label="Статус", choices=Task.STATUSES, required=False)
     close_reason = forms.MultipleChoiceField(label="Тип закрытия", choices=Task.CLOSE_REASONS, required=False)
     created1 = forms.DateTimeField(label="Дата создания от", required=False)
@@ -83,7 +101,7 @@ class MyFilterForm(forms.Form):
 class MyFilter:
     def __init__(self, request, qs):
         self.request = request
-        self.form = MyFilterForm(request.GET)
+        self.form = MyFilterForm(request.GET, user=request.user)
         self.qs = qs
 
     def filter(self):
@@ -139,6 +157,7 @@ class MyFilter:
             if _closed2:
                 _qs = _qs.filter(closed__lte=_closed2)
             return _qs
+        return self.qs # на случай ошибки валидации формы
 
 
 class TaskList(ListView):
@@ -190,7 +209,7 @@ class TaskList(ListView):
         filter = MyFilter(self.request, qs)
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
-        context['filter_form'] = MyFilterForm(self.request.GET)  # filter.form
+        context['filter_form'] = MyFilterForm(self.request.GET, user=self.request.user)  # filter.form
         if get_qry:
             context['get_qry'] = '?' + get_qry
         return context
