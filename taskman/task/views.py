@@ -20,7 +20,7 @@ from django.db.models.expressions import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings, \
-                    Project
+                    Project, UserProfile
 
 from django.conf import settings
 
@@ -174,11 +174,8 @@ class TaskList(ListView):
         current_page_num = int(kwargs.get('page', None))
         get_qry = self.request.GET.urlencode()
         if (not current_page_num is None) and (current_page_num != 1):
-            # my_filter = TaskFilter(self.request.GET, self.get_filtered_qs())
             my_filter = MyFilter(self.request, self.get_filtered_qs()).filter()
-            # pag, page_obj, object_list, is_pag = self.paginate_queryset(my_filter, self.paginate_by)
             paginator_obj = Paginator(my_filter, self.paginate_by)
-            #return HttpResponse('pag.num_pages={} current_page_num={} qry={}'.format(paginator_obj.num_pages, current_page_num, get_qry))
             if paginator_obj.num_pages < current_page_num:
                 current_page_num = paginator_obj.num_pages
                 return redirect(reverse('home', args=[current_page_num, ]) + '?' + get_qry)
@@ -190,7 +187,6 @@ class TaskList(ListView):
         get_qry = self.request.GET.urlencode()
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
-        # filter = TaskFilter(self.request.GET, qs)
         filter = MyFilter(self.request, qs)
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
@@ -214,6 +210,12 @@ class TaskList(ListView):
 
         if self.request.user.is_authenticated():
             qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
+            try:
+                profile = UserProfile.objects.get(user=self.request.user)
+            except:
+                profile = None
+            if profile and profile.project_can_access.count() > 0:
+                qs = qs.filter(Q(project__in=[p for p in profile.project_can_access.all()]))
         else:
             qs = qs.filter(Q(private=False))
 

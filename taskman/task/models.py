@@ -190,3 +190,11 @@ class OnlineSettings(models.Model):
 
     def __str__(self):
         return '{} = {}'.format(self.name, self.value)
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, verbose_name='Пользователь')
+    project_can_access = models.ManyToManyField(Project, verbose_name='Проекты', null=True, blank=True)
+    realted_access_only = models.BooleanField(default=False, verbose_name='Доступны только свои задачи')
+
+    def __str__(self):
+        return self.user.username
