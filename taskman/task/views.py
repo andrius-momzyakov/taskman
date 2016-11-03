@@ -281,9 +281,29 @@ class TaskDetail(DetailView):
 
 
 class NewTaskForm(forms.ModelForm):
+    # TODO:
+    def __init__(self, *args, user=None, status=Task.NEW, type_id=None, **kwargs):
+        super().__init__(*args, *kwargs)
+        project_required = False
+        try:
+            profile = UserProfile.objects.get(user=user)
+            if profile.project_can_access.count() > 0:
+                qs = profile.project_can_access.all()
+                project_required = True
+            else:
+                qs = Project.objects.all()
+        except:
+            qs = Project.objects.all()
+        self.fields['type'].widget.selected = type_id
+        self.fields['status'].initial = status
+        if project_required:
+            self.fields['project'].queryset = qs
+            self.fields['project'].required = True
+
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private', 'status', 'parent', ]
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private',
+                  'status', 'parent', ]
 
         widgets = {
             'deadline_date': forms.TextInput(attrs={'class': 'dt-picker'}),
@@ -300,15 +320,16 @@ class NewTask(View):
         tasktype = None
         try:
             tasktype = TaskType.objects.get(short_typename='TASK')
-            form = NewTaskForm(initial={'type': tasktype, 'status': Task.NEW})
+            form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
+            print(request.user)
         except TaskType.DoesNotExist:
-            form = NewTaskForm(initial={'type': tasktype, 'status': 'NEW'})
+            form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
         return render_to_response(template_name=self.template, context={'form': form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
 
     def post(self, request, *args, **kwargs):
-        form = NewTaskForm(request.POST)
+        form = NewTaskForm(request.POST, user=request.user)
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
@@ -322,6 +343,7 @@ class NewTask(View):
 
 
 class EditTaskForm(forms.ModelForm):
+    # TODO: limit project choice when needed
     file = forms.FileField(label='Файл', required=False)
     comment = forms.CharField(label='Комментарий', widget=forms.Textarea(attrs={'cols': 80}), required=False)
 
@@ -388,6 +410,7 @@ class EditTaskForm(forms.ModelForm):
 
 
 class EditTaskFormGuest(EditTaskForm):
+    # TODO: limit project choice when needed
     class Meta:
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
