@@ -20,7 +20,7 @@ from django.db.models.expressions import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings, \
-                    Project
+                    Project, UserProfile
 
 from django.conf import settings
 
@@ -49,9 +49,20 @@ class TaskForeignKeyChoices:
         return [(user.id, user) for user in User.objects.all()]
 
     @classmethod
-    def get_project_choices(cls):
+    def get_project_choices(cls, user=None):
         # TODO: filter choices depending on user's profile
-        return [(project.id, project) for project in Project.objects.all()]
+        try:
+            profile = UserProfile.objects.get(user=user)
+        except:
+            profile = None
+        qs = None
+        if profile:
+            if profile.project_can_access.count() > 0:
+                qs = profile.project_can_access.all()
+        if not qs:
+            qs = Project.objects.all()
+
+        return [(project.id, project) for project in qs]
 
     @classmethod
     def get_type_choices(cls):
@@ -59,6 +70,14 @@ class TaskForeignKeyChoices:
 
 
 class MyFilterForm(forms.Form):
+    def __init__(self, *args, user=None, **kwargs):
+        super(MyFilterForm, self).__init__(*args, *kwargs)
+        _choices = TaskForeignKeyChoices.get_project_choices(user=user)
+        # print(_choices)
+        self.fields['project'] = forms.MultipleChoiceField(label="Проект",
+                                                           choices=_choices,
+                                                           required=False)
+
     id = forms.IntegerField(label="#", required=False)
     type = forms.MultipleChoiceField(label="Тип задачи", choices=TaskForeignKeyChoices.get_type_choices, required=False)
     subject = forms.CharField(max_length=255, label='Задача', initial='', required=False)
@@ -68,8 +87,7 @@ class MyFilterForm(forms.Form):
                                            required=False)
     executor = forms.MultipleChoiceField(label="Исполнитель", choices=TaskForeignKeyChoices.get_executor_choices,
                                          required=False)
-    project = forms.MultipleChoiceField(label="Проект", choices=TaskForeignKeyChoices.get_project_choices,
-                                        required=False)
+    project = forms.MultipleChoiceField(label="Проект", choices=TaskForeignKeyChoices.get_project_choices, required = False)
     status = forms.MultipleChoiceField(label="Статус", choices=Task.STATUSES, required=False)
     close_reason = forms.MultipleChoiceField(label="Тип закрытия", choices=Task.CLOSE_REASONS, required=False)
     created1 = forms.DateTimeField(label="Дата создания от", required=False)
@@ -83,7 +101,7 @@ class MyFilterForm(forms.Form):
 class MyFilter:
     def __init__(self, request, qs):
         self.request = request
-        self.form = MyFilterForm(request.GET)
+        self.form = MyFilterForm(request.GET, user=request.user)
         self.qs = qs
 
     def filter(self):
@@ -139,6 +157,7 @@ class MyFilter:
             if _closed2:
                 _qs = _qs.filter(closed__lte=_closed2)
             return _qs
+        return self.qs # на случай ошибки валидации формы
 
 
 class TaskList(ListView):
@@ -174,11 +193,8 @@ class TaskList(ListView):
         current_page_num = int(kwargs.get('page', None))
         get_qry = self.request.GET.urlencode()
         if (not current_page_num is None) and (current_page_num != 1):
-            # my_filter = TaskFilter(self.request.GET, self.get_filtered_qs())
             my_filter = MyFilter(self.request, self.get_filtered_qs()).filter()
-            # pag, page_obj, object_list, is_pag = self.paginate_queryset(my_filter, self.paginate_by)
             paginator_obj = Paginator(my_filter, self.paginate_by)
-            #return HttpResponse('pag.num_pages={} current_page_num={} qry={}'.format(paginator_obj.num_pages, current_page_num, get_qry))
             if paginator_obj.num_pages < current_page_num:
                 current_page_num = paginator_obj.num_pages
                 return redirect(reverse('home', args=[current_page_num, ]) + '?' + get_qry)
@@ -190,11 +206,10 @@ class TaskList(ListView):
         get_qry = self.request.GET.urlencode()
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
-        # filter = TaskFilter(self.request.GET, qs)
         filter = MyFilter(self.request, qs)
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
-        context['filter_form'] = MyFilterForm(self.request.GET)  # filter.form
+        context['filter_form'] = MyFilterForm(self.request.GET, user=self.request.user)  # filter.form
         if get_qry:
             context['get_qry'] = '?' + get_qry
         return context
@@ -214,6 +229,12 @@ class TaskList(ListView):
 
         if self.request.user.is_authenticated():
             qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
+            try:
+                profile = UserProfile.objects.get(user=self.request.user)
+            except:
+                profile = None
+            if profile and profile.project_can_access.count() > 0:
+                qs = qs.filter(Q(project__in=[p for p in profile.project_can_access.all()]))
         else:
             qs = qs.filter(Q(private=False))
 
@@ -260,9 +281,29 @@ class TaskDetail(DetailView):
 
 
 class NewTaskForm(forms.ModelForm):
+    # TODO:
+    def __init__(self, *args, user=None, status=Task.NEW, type_id=None, **kwargs):
+        super().__init__(*args, *kwargs)
+        project_required = False
+        try:
+            profile = UserProfile.objects.get(user=user)
+            if profile.project_can_access.count() > 0:
+                qs = profile.project_can_access.all()
+                project_required = True
+            else:
+                qs = Project.objects.all()
+        except:
+            qs = Project.objects.all()
+        self.fields['type'].widget.selected = type_id
+        self.fields['status'].initial = status
+        if project_required:
+            self.fields['project'].queryset = qs
+            self.fields['project'].required = True
+
     class Meta:
         model = Task
-        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private', 'status', 'parent', ]
+        fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'private',
+                  'status', 'parent', ]
 
         widgets = {
             'deadline_date': forms.TextInput(attrs={'class': 'dt-picker'}),
@@ -279,15 +320,16 @@ class NewTask(View):
         tasktype = None
         try:
             tasktype = TaskType.objects.get(short_typename='TASK')
-            form = NewTaskForm(initial={'type': tasktype, 'status': Task.NEW})
+            form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
+            print(request.user)
         except TaskType.DoesNotExist:
-            form = NewTaskForm(initial={'type': tasktype, 'status': 'NEW'})
+            form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
         return render_to_response(template_name=self.template, context={'form': form},
                                   context_instance=RequestContext(request, {}
                                                                   .update(csrf(request))))
 
     def post(self, request, *args, **kwargs):
-        form = NewTaskForm(request.POST)
+        form = NewTaskForm(request.POST, user=request.user)
         if form.is_valid():
             task = form.save(commit=False)
             task.created_by = request.user
@@ -301,6 +343,7 @@ class NewTask(View):
 
 
 class EditTaskForm(forms.ModelForm):
+    # TODO: limit project choice when needed
     file = forms.FileField(label='Файл', required=False)
     comment = forms.CharField(label='Комментарий', widget=forms.Textarea(attrs={'cols': 80}), required=False)
 
@@ -367,6 +410,7 @@ class EditTaskForm(forms.ModelForm):
 
 
 class EditTaskFormGuest(EditTaskForm):
+    # TODO: limit project choice when needed
     class Meta:
         model = Task
         fields = ['type', 'project', 'module', 'subject', 'desc', 'executor', 'deadline_date', 'status',
