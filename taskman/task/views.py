@@ -207,6 +207,7 @@ class TaskList(ListView):
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
         filter = MyFilter(self.request, qs)
+        print(list(qs))
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
         context['filter_form'] = MyFilterForm(self.request.GET, user=self.request.user)  # filter.form
@@ -228,6 +229,11 @@ class TaskList(ListView):
             qs = TaskView.objects.all()
 
         if self.request.user.is_authenticated():
+            uid = self.request.user.id
+            qs = qs.extra(where=['prty_user_id is null or prty_user_id = %s or (prty_user_id != %s and '
+                                 'not exists(select 1 from task_vtask where prty_user_id =%s))'],
+                          params=[uid, uid, uid])
+            # filter(Q(prty_user_id=self.request.user)|Q(prty_user_id__isnull=True))
             qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
             try:
                 profile = UserProfile.objects.get(user=self.request.user)

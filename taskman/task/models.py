@@ -164,6 +164,9 @@ class TaskView(models.Model):
                                null=True, blank=True)
     prty = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
     private = models.BooleanField(verbose_name='Частная', default=True)
+    prty_user_id= models.ForeignKey(User, related_name='vprty_user', on_delete=models.DO_NOTHING,
+                                    verbose_name='Пользователь приоритета', null=True, blank=True,
+                                    db_column='prty_user_id')
 
     class Meta:
         managed = False
