@@ -3,12 +3,14 @@ import urllib
 import os
 from datetime import datetime
 
-from django.shortcuts import render, redirect, HttpResponse, render_to_response, RequestContext, \
+from django.shortcuts import render, redirect, HttpResponse, render_to_response, \
     get_object_or_404
+from django.template import RequestContext
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, View
 from django.core.files import File
-from django.core.context_processors import csrf
+#from django.core.context_processors import csrf
+from django.views import csrf
 import django.forms as forms
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -20,7 +22,7 @@ from django.db.models.expressions import F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Task, Comment, Attachment, TaskType, TaskUserPriority, TaskView, OnlineSettings, \
-                    Project, UserProfile
+                    Project, UserProfile, TaskPriority
 
 from django.conf import settings
 
@@ -230,9 +232,6 @@ class TaskList(ListView):
 
         if self.request.user.is_authenticated():
             uid = self.request.user.id
-            qs = qs.extra(where=['prty_user_id is null or prty_user_id = %s or (prty_user_id != %s and '
-                                 'not exists(select 1 from task_vtask where prty_user_id =%s))'],
-                          params=[uid, uid, uid])
             # filter(Q(prty_user_id=self.request.user)|Q(prty_user_id__isnull=True))
             qs = qs.filter(Q(private=False) | Q(private=True, created_by=self.request.user))
             try:
@@ -577,15 +576,15 @@ def update_task_priority_view(request, task_id=None, increase=None):
 
 def update_task_priority(request, task_id=None, increase=None):
     t = get_object_or_404(Task, pk=task_id)
-    u = request.user
-    TaskUserPriority.objects.filter(task=t, user=u).delete()
-    new_priority = TaskUserPriority(task=t, user=u)
+    # u = request.user
+    TaskPriority.objects.filter(task=t).delete()
+    new_priority = TaskPriority(task=t)
     new_priority.save()
     if increase == 'down':
         new_priority.priority = -1 * F('id')
     else:
         new_priority.priority = F('id')
-    new_priority.save()
+    # new_priority.save()
 
 def throw_error(request, message):
     return ShowErrorMessage().get(request, message=message)

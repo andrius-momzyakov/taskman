@@ -16,17 +16,10 @@ CREATE OR REPLACE VIEW task_vtask_null AS
     t.module_id,
     t.project_id,
     t.status,
-    tup.prty,
+    tp.priority AS prty,
     t.private
    FROM task_task t
-     LEFT JOIN ( SELECT t_1.prty,
-            t_1.user_id,
-            t_1.task_id
-           FROM ( SELECT max(p.priority) AS prty,
-                    p.user_id,
-                    p.task_id
-                   FROM task_taskuserpriority p
-                  GROUP BY p.user_id, p.task_id) t_1) tup ON t.id = tup.task_id;
+     LEFT JOIN  task_taskpriority tp ON t.id = tp.task_id;
 
 ALTER TABLE task_vtask_null
   OWNER TO postgres;

@@ -136,6 +136,10 @@ class TaskUserPriority(models.Model):
     task = models.ForeignKey(Task, verbose_name='Задача', )
     user = models.ForeignKey(User, verbose_name='Пользователь')
 
+class TaskPriority(models.Model):
+    priority = models.IntegerField(verbose_name='Значение приоритета', null=True, blank=True)
+    task = models.ForeignKey(Task, verbose_name='Задача', )
+
 
 class TaskView(models.Model):
     subject = models.CharField(max_length=255, verbose_name='Задача')
@@ -164,9 +168,6 @@ class TaskView(models.Model):
                                null=True, blank=True)
     prty = models.IntegerField(verbose_name='Приоритет (не задавать вручную!)', default=0)
     private = models.BooleanField(verbose_name='Частная', default=True)
-    prty_user_id= models.ForeignKey(User, related_name='vprty_user', on_delete=models.DO_NOTHING,
-                                    verbose_name='Пользователь приоритета', null=True, blank=True,
-                                    db_column='prty_user_id')
 
     class Meta:
         managed = False
