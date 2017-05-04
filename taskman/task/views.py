@@ -209,7 +209,6 @@ class TaskList(ListView):
         status_qry_val = self.request.GET.get('status_in')
         qs = self.get_filtered_qs(status_qry_val=status_qry_val)
         filter = MyFilter(self.request, qs)
-        print(list(qs))
         pag, context['page_obj'], context['object_list'], is_pag = self.paginate_queryset(filter.filter(), self.paginate_by)
         context['page_numbers'] = map(lambda x: x + 1, list(range(pag.num_pages)))
         context['filter_form'] = MyFilterForm(self.request.GET, user=self.request.user)  # filter.form
@@ -326,7 +325,6 @@ class NewTask(View):
         try:
             tasktype = TaskType.objects.get(short_typename='TASK')
             form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
-            print(request.user)
         except TaskType.DoesNotExist:
             form = NewTaskForm(user=request.user, status=Task.NEW, type_id=tasktype.id)
         return render_to_response(template_name=self.template, context={'form': form},
@@ -580,11 +578,12 @@ def update_task_priority(request, task_id=None, increase=None):
     TaskPriority.objects.filter(task=t).delete()
     new_priority = TaskPriority(task=t)
     new_priority.save()
+    print(new_priority.id)
     if increase == 'down':
         new_priority.priority = -1 * F('id')
     else:
         new_priority.priority = F('id')
-    # new_priority.save()
+    new_priority.save()
 
 def throw_error(request, message):
     return ShowErrorMessage().get(request, message=message)
