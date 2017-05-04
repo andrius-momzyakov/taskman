@@ -19,3 +19,9 @@
     short_typename: REQUIRE
     typename: требование
 
+-model: task.OnlineSettings
+  pk: 1
+  fields:
+    code: VEIL_LIST
+    name: "Скрывать для анонимных пользователей"
+    value: Y
