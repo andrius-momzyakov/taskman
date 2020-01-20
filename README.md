@@ -10,6 +10,6 @@ Sandbox version is present at http://amomzyakov.pythonanywhere.com/task/
 
 ### Requirements
 
-Uses JQuery installed to directory bind to /static/.
+Uses JQuery installed to directory bound to /static/.
 
 ##
